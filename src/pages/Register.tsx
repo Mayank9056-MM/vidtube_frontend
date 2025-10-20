@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, UserPlus, Moon, Sun, Upload, X, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,6 +23,7 @@ export default function Register() {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const navigate = useNavigate()
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -157,6 +159,7 @@ export default function Register() {
 
   const handleLogin = () => {
     console.log('Navigate to login page');
+    navigate("/login")
   };
 
   return (

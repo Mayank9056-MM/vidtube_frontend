@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Eye, EyeOff, LogIn, Moon, Sun } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +25,7 @@ export default function Login() {
     password?: string;
   }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate()
 
   const validateForm = () => {
     const newErrors: { emailOrUsername?: string; password?: string } = {};
@@ -73,6 +75,7 @@ export default function Login() {
   const handleRegister = () => {
     console.log("Navigate to register page");
     // Add your navigation logic here
+    navigate("/register")
   };
 
   return (
