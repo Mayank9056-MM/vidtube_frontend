@@ -1,11 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from '@/hooks/useAuth'
-import Home from '@/pages/Home'
-import Login from '@/pages/Login'
-import Register from '@/pages/Register'
-import Watch from '@/pages/Watch'
-import Upload from '@/pages/Upload'
-import Dashboard from '@/pages/Dashboard'
 
 /**
  * Protect routes based on auth state

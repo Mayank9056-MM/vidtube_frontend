@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Route, Routes } from 'react-router-dom'
+import Login from './pages/Login'
 
 const App = () => {
   const currUser = useState(null)
@@ -8,7 +9,7 @@ const App = () => {
     <div>
       <Routes>
         {
-          !currUser ? <Route path='/login' /> : <>
+          currUser ? <Route path='/login' element={<Login />} /> : <>
           <Route path='/' />
           </> 
         }
