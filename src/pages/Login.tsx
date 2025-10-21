@@ -42,7 +42,7 @@ export default function Login() {
     const res = await dispatch(loginUser(data));
     if (loginUser.fulfilled.match(res)) {
       showSuccess("Login successful 🎉");
-      // navigate("/dashboard"); // example route
+      navigate("/home");
     } else {
       showError(res.message || "Invalid credentials");
     }
