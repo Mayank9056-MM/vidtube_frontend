@@ -1,46 +1,66 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+// src/AppRoutes.tsx
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+
+// Import your pages
+import Home from "@/pages/Home";
+import Register from "@/pages/Register";
+import Login from "@/pages/Login";
+// import Watch from "@/pages/Watch";
+// import Upload from "@/pages/Upload";
+// import Dashboard from "@/pages/Dashboard";
 
 /**
- * Protect routes based on auth state
+ * Protected route wrapper
  */
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-  const { isAuthenticated, initialized } = useAuth()
+  const { isAuthenticated, initialized } = useAuth();
 
-  if (!initialized) return <p>Loading...</p>
-  return isAuthenticated ? children : <Navigate to="/login" />
-}
+  if (!initialized) {
+    return (
+      <div className="flex items-center justify-center h-screen text-lg font-medium">
+        Loading session...
+      </div>
+    );
+  }
+
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
 export const AppRoutes = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/watch/:id" element={<Watch />} />
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      {/* <Route path="/watch/:id" element={<Watch />} /> */}
 
-        {/* Protected Routes */}
-        <Route
+      {/* Protected Routes */}
+      {/* <Route
           path="/upload"
           element={
-            <PrivateRoute>
-              <Upload />
-            </PrivateRoute>
+            // <PrivateRoute>
+            //   <Upload />
+            // </PrivateRoute>
           }
-        />
-        <Route
+        /> */}
+      {/* <Route
           path="/dashboard"
           element={
             <PrivateRoute>
               <Dashboard />
             </PrivateRoute>
           }
-        />
+        /> */}
 
-        {/* 404 Fallback */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </Router>
-  )
-}
+      {/* 404 Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};

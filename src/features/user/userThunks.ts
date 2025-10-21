@@ -19,6 +19,12 @@ import type {
 } from "../../api/userApi.types";
 import { logger } from "@/utls/logger";
 
+interface LoginData {
+  email?: string;
+  username?: string;
+  password: string;
+}
+
 // Register
 export const registerUser = createAsyncThunk(
   "user/register",
@@ -28,24 +34,28 @@ export const registerUser = createAsyncThunk(
       logger.info("register user from user thunks", res);
       return res;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
 
 // Login
-export const loginUser = createAsyncThunk(
-  "user/login",
-  async (data: LoginUserData, { rejectWithValue }) => {
-    try {
-      const res = await loginUserApi(data);
-      logger.info("login user from user thunks", res);
-      return res;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const loginUser = createAsyncThunk<
+  any,
+  LoginUserData,
+  { rejectValue: string }
+>("user/login", async (data, { rejectWithValue }) => {
+  try {
+    const payload: LoginData = data.emailOrUsername.includes("@")
+      ? { email: data.emailOrUsername, password: data.password }
+      : { username: data.emailOrUsername, password: data.password };
+    const res = await loginUserApi(payload);
+    logger.info("login user from user thunks", res);
+    return res;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || error.message);
   }
-);
+});
 
 // logout
 export const LogoutUser = createAsyncThunk(
@@ -56,7 +66,7 @@ export const LogoutUser = createAsyncThunk(
       logger.info("logout from user thunks", res);
       return res;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -70,7 +80,7 @@ export const refreshAccessToken = createAsyncThunk(
       logger.info("refresh access token from user thunks", res);
       return res;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -84,7 +94,7 @@ export const fetchCurrentUser = createAsyncThunk(
       logger.info("current user from user thunks", res);
       return res;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -98,7 +108,7 @@ export const updateAccount = createAsyncThunk(
       logger.info("update account user from user thunks", res);
       return res;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -112,7 +122,7 @@ export const updateAvatar = createAsyncThunk(
       logger.info("update avatar user from user thunks", res);
       return res;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -126,7 +136,7 @@ export const getWatchHistory = createAsyncThunk(
       logger.info("get watch history user from user thunks", res);
       return res;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
