@@ -10,60 +10,41 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye, EyeOff, LogIn, Moon, Sun } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { useForm } from "react-hook-form";
+import type { LoginUserData } from "../api/userApi.types";
+import { loginUser } from "@/features/user/userThunks";
+import { useToast } from "@/hooks/useToast";
+import type { RootState } from "@/app/store";
+import { useSelector } from "react-redux";
+import { logger } from "@/utls/logger";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [formData, setFormData] = useState({
-    emailOrUsername: "",
-    password: "",
-  });
-  const [errors, setErrors] = useState<{
-    emailOrUsername?: string;
-    password?: string;
-  }>({});
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate()
+  const theme = useSelector((state: RootState) => state.user.theme);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { showError, showSuccess } = useToast();
 
-  const validateForm = () => {
-    const newErrors: { emailOrUsername?: string; password?: string } = {};
+  const { loading } = useAppSelector((state) => state.user);
 
-    if (!formData.emailOrUsername.trim()) {
-      newErrors.emailOrUsername = "Email or username is required";
-    }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isValid },
+  } = useForm<LoginUserData>();
 
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Login attempt:", formData);
-      setIsLoading(false);
-      // Here you would navigate to dashboard or show success
-    }, 1500);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name as keyof typeof errors]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+  const onSubmit = async (data: LoginUserData) => {
+    logger.debug("data from login page",data)
+    console.log(data)
+    const res = await dispatch(loginUser(data));
+    if (loginUser.fulfilled.match(res)) {
+      showSuccess("Login successful 🎉");
+      // navigate("/dashboard"); // example route
+    } else {
+      showError(res.message || "Invalid credentials");
     }
   };
 
@@ -75,129 +56,118 @@ export default function Login() {
   const handleRegister = () => {
     console.log("Navigate to register page");
     // Add your navigation logic here
-    navigate("/register")
+    navigate("/register");
   };
 
   return (
-    <div className={isDarkMode ? "dark" : ""}>
+    <div className={theme === "dark" ? "dark" : ""}>
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 transition-colors duration-300">
-        <Button
-          variant="outline"
-          size="icon"
-          className="absolute top-4 right-4 rounded-full"
-          onClick={() => setIsDarkMode(!isDarkMode)}
-        >
-          {isDarkMode ? (
-            <Sun className="h-5 w-5" />
-          ) : (
-            <Moon className="h-5 w-5" />
-          )}
-        </Button>
-
         <Card className="w-full max-w-md shadow-2xl">
-          <CardHeader className="space-y-1">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <LogIn className="w-6 h-6 text-white" />
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardHeader className="space-y-1">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <LogIn className="w-6 h-6 text-white" />
+                </div>
               </div>
-            </div>
-            <CardTitle className="text-2xl font-bold text-center">
-              Welcome back
-            </CardTitle>
-            <CardDescription className="text-center">
-              Enter your credentials to access your account
-            </CardDescription>
-          </CardHeader>
+              <CardTitle className="text-2xl font-bold text-center">
+                Welcome back
+              </CardTitle>
+              <CardDescription className="text-center">
+                Enter your credentials to access your account
+              </CardDescription>
+            </CardHeader>
 
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="emailOrUsername">Email or Username</Label>
-              <Input
-                id="emailOrUsername"
-                name="emailOrUsername"
-                type="text"
-                placeholder="Enter your email or username"
-                value={formData.emailOrUsername}
-                onChange={handleInputChange}
-                className={errors.emailOrUsername ? "border-red-500" : ""}
-                disabled={isLoading}
-              />
-              {errors.emailOrUsername && (
-                <p className="text-sm text-red-500">{errors.emailOrUsername}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="emailOrUsername">Email or Username</Label>
                 <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={errors.password ? "border-red-500 pr-10" : "pr-10"}
-                  disabled={isLoading}
+                  id="emailOrUsername"
+                  type="text"
+                  placeholder="Enter your email or username"
+                  {...register("emailOrUsername")}
+                  className={errors.emailOrUsername ? "border-red-500" : ""}
+                  disabled={isSubmitting || loading}
                 />
+                {errors.emailOrUsername && (
+                  <p className="text-sm text-red-500">
+                    {errors.emailOrUsername.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    {...register("password")}
+                    className={
+                      errors.password ? "border-red-500 pr-10" : "pr-10"
+                    }
+                    disabled={isSubmitting || loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-red-500">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center justify-end">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
-                  disabled={isLoading}
+                  onClick={handleForgotPassword}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                  // disabled={isLoading}
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
+                  Forgot password?
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password}</p>
-              )}
-            </div>
+            </CardContent>
 
-            <div className="flex items-center justify-end">
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-                disabled={isLoading}
+            <CardFooter className="flex flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium"
+                disabled={!isValid || isSubmitting || loading}
               >
-                Forgot password?
-              </button>
-            </div>
-          </CardContent>
-
-          <CardFooter className="flex flex-col space-y-4">
-            <Button
-              onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Signing in...
-                </span>
-              ) : (
-                "Sign in"
-              )}
-            </Button>
-
-            <div className="text-center text-sm text-slate-600 dark:text-slate-400">
-              New here?{" "}
-              <button
-                type="button"
-                onClick={handleRegister}
-                className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-                disabled={isLoading}
-              >
-                Register
-              </button>
-            </div>
-          </CardFooter>
+                {isSubmitting || loading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  "Sign in"
+                )}
+              </Button>
+              <div className="text-center text-sm text-slate-600 dark:text-slate-400">
+                New here?{" "}
+                <button
+                  type="button"
+                  onClick={handleRegister}
+                  className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                  // disabled={isLoading}
+                >
+                  Register
+                </button>
+              </div>
+            </CardFooter>
+          </form>
         </Card>
       </div>
     </div>
