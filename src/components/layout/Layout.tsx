@@ -6,7 +6,7 @@ export const Layout = () => {
   return (
     <div className="flex h-screen bg-background text-foreground">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar  />
 
       {/* Main Area */}
       <div className="flex flex-col flex-1 overflow-hidden">

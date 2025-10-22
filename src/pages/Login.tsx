@@ -37,7 +37,7 @@ export default function Login() {
   } = useForm<LoginUserData>();
 
   const onSubmit = async (data: LoginUserData) => {
-    logger.debug("data from login page", data);
+    logger.info("data from login page", data);
     console.log(data);
     const res = await dispatch(loginUser(data));
     if (loginUser.fulfilled.match(res)) {

@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useAppSelector } from "@/app/hooks";
 import type { RootState } from "@/app/store";
-import { Navbar } from "@/components/layout/Navbar";
-import { Sidebar } from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,7 +30,6 @@ export interface PublishVideoData {
 }
 
 export default function UploadPage() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string>("");
@@ -50,9 +47,6 @@ export default function UploadPage() {
     reset,
   } = useForm<Omit<PublishVideoData, "video" | "thumbnail">>();
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -138,18 +132,14 @@ export default function UploadPage() {
           : "bg-white text-gray-900"
       }`}
     >
-      {/* Sidebar */}
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Main Area */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Navbar */}
-        <Navbar />
 
         {/* Mobile Menu Button */}
         <div className="lg:hidden sticky top-[60px] z-40">
           <button
-            onClick={toggleSidebar}
+            // onClick={toggleSidebar}
             className={`m-4 p-2 rounded-lg ${
               theme === "dark"
                 ? "bg-gray-800 hover:bg-gray-700"
