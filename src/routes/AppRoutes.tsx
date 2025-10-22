@@ -11,8 +11,9 @@ import { useAuth } from "@/hooks/useAuth";
 import Home from "@/pages/Home";
 import Register from "@/pages/Register";
 import Login from "@/pages/Login";
+import { Layout } from "lucide-react";
 // import Watch from "@/pages/Watch";
-// import Upload from "@/pages/Upload";
+import Upload from "@/pages/Upload";
 // import Dashboard from "@/pages/Dashboard";
 
 /**
@@ -41,23 +42,28 @@ export const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       {/* <Route path="/watch/:id" element={<Watch />} /> */}
 
-      {/* Protected Routes */}
-      {/* <Route
-          path="/upload"
-          element={
-            // <PrivateRoute>
-            //   <Upload />
-            // </PrivateRoute>
-          }
-        /> */}
-      {/* <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        /> */}
+          <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+
+           <Route
+            path="/upload"
+            element={
+              <PrivateRoute>
+                <Upload />
+              </PrivateRoute>
+            }
+          />
+{/* 
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />  */}
+        </Route>
+
 
       {/* 404 Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
