@@ -1,21 +1,29 @@
 import React, { useState } from "react";
 import { Search, Upload, Bell, PlaySquare, Settings, User } from "lucide-react";
-import { useAppSelector } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import type { RootState } from "@/app/store";
 import { useNavigate } from "react-router-dom";
+import { LogoutUser } from "@/features/user/userThunks";
 
 // Navbar Component
 export const Navbar = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const theme = useAppSelector((state: RootState) => state.user.theme);
-  const navigate = useNavigate()
+  const { theme, user, loading, error } = useAppSelector(
+    (state: RootState) => state.user
+  );
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const notifications = [
     { id: 1, text: "New comment on your video", time: "2m ago" },
     { id: 2, text: "Someone liked your post", time: "1h ago" },
     { id: 3, text: "New subscriber!", time: "3h ago" },
   ];
+
+  const logOutHandler = async () => {
+    await dispatch(LogoutUser());
+  };
 
   return (
     <nav
@@ -63,7 +71,7 @@ export const Navbar = () => {
           <button
             onClick={() => navigate("/upload")}
             className={`p-2 rounded-full hover:bg-opacity-10 ${
-              theme === "dark" ? "hover:bg-white" : "hover:bg-black"
+              theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
             } transition-colors`}
           >
             <Upload className="w-6 h-6" />
@@ -74,7 +82,7 @@ export const Navbar = () => {
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className={`p-2 rounded-full hover:bg-opacity-10 ${
-                theme === "dark" ? "hover:bg-white" : "hover:bg-black"
+                theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
               } transition-colors relative`}
             >
               <Bell className="w-6 h-6" />
@@ -101,7 +109,7 @@ export const Navbar = () => {
                     <div
                       key={notif.id}
                       className={`px-4 py-3 hover:bg-opacity-5 ${
-                        theme === "dark" ? "hover:bg-white" : "hover:bg-black"
+                        theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
                       } cursor-pointer`}
                     >
                       <p className="text-sm">{notif.text}</p>
@@ -125,7 +133,7 @@ export const Navbar = () => {
               onClick={() => setShowProfile(!showProfile)}
               className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold"
             >
-              JD
+              {user?.username.charAt(0).toUpperCase()}
             </button>
 
             {showProfile && (
@@ -141,26 +149,26 @@ export const Navbar = () => {
                     theme === "dark" ? "border-gray-700" : "border-gray-200"
                   }`}
                 >
-                  <p className="font-semibold">John Doe</p>
+                  <p className="font-semibold">{user?.fullName}</p>
                   <p
                     className={`text-sm ${
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    john@example.com
+                    {user?.email}
                   </p>
                 </div>
                 <button
                   className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
-                    theme === "dark" ? "hover:bg-white" : "hover:bg-black"
+                    theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
                   }`}
                 >
                   <User className="w-4 h-4 inline mr-2" />
-                  Your Channel
+                  {user?.username}
                 </button>
                 <button
                   className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
-                    theme === "dark" ? "hover:bg-white" : "hover:bg-black"
+                    theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
                   }`}
                 >
                   <Settings className="w-4 h-4 inline mr-2" />
@@ -173,8 +181,9 @@ export const Navbar = () => {
                 >
                   <button
                     className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
-                      theme === "dark" ? "hover:bg-white" : "hover:bg-black"
+                      theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
                     }`}
+                    onClick={() => logOutHandler()}
                   >
                     Sign out
                   </button>

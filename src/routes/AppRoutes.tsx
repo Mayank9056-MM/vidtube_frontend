@@ -1,37 +1,24 @@
 // src/AppRoutes.tsx
-import {
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
-// Import your pages
 import Home from "@/pages/Home";
 import Register from "@/pages/Register";
 import Login from "@/pages/Login";
-import { Layout } from "@/components/layout/Layout";
-// import Watch from "@/pages/Watch";
 import Upload from "@/pages/Upload";
+import { Layout } from "@/components/layout/Layout";
 import type { JSX } from "react";
+import Loader from "@/components/common/Loader";
 import { logger } from "@/utls/logger";
-// import Dashboard from "@/pages/Dashboard";
 
-/**
- * Protected route wrapper
- */
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-  const { isAuthenticated, initialized } = useAuth();
+  const { isAuthenticated, initialized, loading } = useAuth();
 
-  logger.info("isAuthenticated",isAuthenticated)
-  logger.info("initialized",initialized)
+  logger.info(isAuthenticated, "isAuthenticated");
+  logger.info(initialized, "initialized");
 
-  if (!initialized) {
-    return (
-      <div className="flex items-center justify-center h-screen text-lg font-medium">
-        Loading session...
-      </div>
-    );
+  if (!initialized || loading) {
+    return <Loader />;
   }
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
@@ -41,39 +28,33 @@ export const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      {/* <Route path="/watch/:id" element={<Watch />} /> */}
 
-          <Route element={<Layout />}>
-          <Route path="/" element={
-            <PrivateRoute>
+      {/* Protected Routes */}
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <Layout>
               <Home />
-            </PrivateRoute>
-            } />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
 
-           <Route
-            path="/upload"
-            element={
-              <PrivateRoute>
-                <Upload />
-              </PrivateRoute>
-            }
-          />
-{/* 
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />  */}
-        </Route>
+      <Route
+        path="/upload"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <Upload />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
 
-
-      {/* 404 Fallback */}
+      {/* 404 fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

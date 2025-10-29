@@ -9,7 +9,11 @@ export const useAuth = () => {
   const navigate = useNavigate();
 
   const { user, loading, tokenRefreshing } = useAppSelector((state) => state.user);
+
   logger.info("user from useAuth",user)
+  // logger.info("loading from useAuth",loading)
+  // logger.info("tokenRefershing",tokenRefreshing)
+
   const [initialized, setInitialized] = useState(false);
 
   // Fetch the current user from cookie-based session
