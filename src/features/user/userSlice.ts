@@ -10,9 +10,10 @@ import {
   LogoutUser,
   refreshAccessToken,
 } from "./userThunks";
+import type { User } from "@/types/global";
 
 interface UserState {
-  user: Record<string, any> | null;
+  user: User | null;
   loading: boolean;
   error: string | null;
   theme: "light" | "dark";
