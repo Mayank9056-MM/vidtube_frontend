@@ -24,7 +24,9 @@ const getInitialTheme = (): "light" | "dark" => {
   if (typeof window === "undefined") return "light";
   const saved = localStorage.getItem("theme") as "light" | "dark" | null;
   if (saved) return saved;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 };
 
 const initialState: UserState = {
@@ -44,7 +46,6 @@ const userSlice = createSlice({
       state.user = null;
       state.error = null;
       state.successMessage = null;
-      localStorage.removeItem("token");
     },
     toggleTheme: (state) => {
       state.theme = state.theme === "dark" ? "light" : "dark";
@@ -54,7 +55,10 @@ const userSlice = createSlice({
     setTheme: (state, action) => {
       state.theme = action.payload;
       localStorage.setItem("theme", action.payload);
-      document.documentElement.classList.toggle("dark", action.payload === "dark");
+      document.documentElement.classList.toggle(
+        "dark",
+        action.payload === "dark"
+      );
     },
     clearError: (state) => {
       state.error = null;
@@ -100,7 +104,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = action.payload.data;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.loading = false;
@@ -154,7 +158,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.user = null;
         state.successMessage = "Logged out successfully";
-        localStorage.removeItem("token");
+       
       })
       .addCase(LogoutUser.rejected, (state, action) => {
         state.loading = false;
@@ -168,9 +172,6 @@ const userSlice = createSlice({
       })
       .addCase(refreshAccessToken.fulfilled, (state, action) => {
         state.tokenRefreshing = false;
-        if (action.payload?.token) {
-          localStorage.setItem("token", action.payload.token);
-        }
       })
       .addCase(refreshAccessToken.rejected, (state) => {
         state.tokenRefreshing = false;

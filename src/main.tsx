@@ -14,7 +14,8 @@ createRoot(document.getElementById("root")!).render(
         <App />
         {/* Toast  */}
         <Toaster
-          position="top-right"
+          position="bottom-right"
+          reverseOrder={false}
           toastOptions={{
             success: {
               style: {
