@@ -91,7 +91,7 @@ export const fetchCurrentUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await currentUserApi();
-      logger.info("current user from user thunks", res);
+      // logger.info("current user from user thunks", res);
       return res;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);

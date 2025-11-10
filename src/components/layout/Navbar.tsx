@@ -1,196 +1,302 @@
-import React, { useState } from "react";
-import { Search, Upload, Bell, PlaySquare, Settings, User } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import type { RootState } from "@/app/store";
-import { useNavigate } from "react-router-dom";
-import { LogoutUser } from "@/features/user/userThunks";
+// import React, { useState } from "react";
+// import { Search, Upload, Bell, PlaySquare, Settings, User } from "lucide-react";
+// import { useAppDispatch, useAppSelector } from "@/app/hooks";
+// import type { RootState } from "@/app/store";
+// import { useNavigate } from "react-router-dom";
+// import { LogoutUser } from "@/features/user/userThunks";
 
-// Navbar Component
-export const Navbar = () => {
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
-  const { theme, user, loading, error } = useAppSelector(
-    (state: RootState) => state.user
-  );
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+import { Bell, LogOut, Moon, Search, Settings, Sun, Upload, Video } from "lucide-react";
+import { useState } from "react";
 
-  const notifications = [
-    { id: 1, text: "New comment on your video", time: "2m ago" },
-    { id: 2, text: "Someone liked your post", time: "1h ago" },
-    { id: 3, text: "New subscriber!", time: "3h ago" },
-  ];
+// // Navbar Component
+// export const Navbar = () => {
+//   const [showNotifications, setShowNotifications] = useState(false);
+//   const [showProfile, setShowProfile] = useState(false);
+//   const { theme, user, loading, error } = useAppSelector(
+//     (state: RootState) => state.user
+//   );
+//   const navigate = useNavigate();
+//   const dispatch = useAppDispatch();
 
-  const logOutHandler = async () => {
-    await dispatch(LogoutUser());
-  };
+//   const notifications = [
+//     { id: 1, text: "New comment on your video", time: "2m ago" },
+//     { id: 2, text: "Someone liked your post", time: "1h ago" },
+//     { id: 3, text: "New subscriber!", time: "3h ago" },
+//   ];
+
+//   const logOutHandler = async () => {
+//     await dispatch(LogoutUser());
+//   };
+
+//   return (
+//     <nav
+//       className={`sticky top-0 z-50 ${
+//         theme === "dark"
+//           ? "bg-gray-900 border-gray-800"
+//           : "bg-white border-gray-200"
+//       } border-b`}
+//     >
+//       <div className="flex items-center justify-between px-4 py-3">
+//         {/* Left: Logo & Search */}
+//         <div className="flex items-center gap-4 flex-1">
+//           <div className="flex items-center gap-2">
+//             <PlaySquare
+//               className={`w-8 h-8 ${
+//                 theme === "dark" ? "text-red-500" : "text-red-600"
+//               }`}
+//             />
+//             <span className="text-xl font-bold hidden sm:block">VideoHub</span>
+//           </div>
+
+//           <div className="flex-1 max-w-2xl">
+//             <div className="relative">
+//               <input
+//                 type="text"
+//                 placeholder="Search..."
+//                 className={`w-full px-4 py-2 pl-10 rounded-full ${
+//                   theme === "dark"
+//                     ? "bg-gray-800 text-white placeholder-gray-400 focus:bg-gray-700"
+//                     : "bg-gray-100 text-gray-900 placeholder-gray-500 focus:bg-gray-200"
+//                 } focus:outline-none transition-colors`}
+//               />
+//               <Search
+//                 className={`absolute left-3 top-2.5 w-5 h-5 ${
+//                   theme === "dark" ? "text-gray-400" : "text-gray-500"
+//                 }`}
+//               />
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Right: Actions */}
+//         <div className="flex items-center gap-3">
+//           {/* Upload Button */}
+//           <button
+//             onClick={() => navigate("/upload")}
+//             className={`p-2 rounded-full hover:bg-opacity-10 ${
+//               theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
+//             } transition-colors`}
+//           >
+//             <Upload className="w-6 h-6" />
+//           </button>
+
+//           {/* Notifications */}
+//           <div className="relative">
+//             <button
+//               onClick={() => setShowNotifications(!showNotifications)}
+//               className={`p-2 rounded-full hover:bg-opacity-10 ${
+//                 theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
+//               } transition-colors relative`}
+//             >
+//               <Bell className="w-6 h-6" />
+//               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+//             </button>
+
+//             {showNotifications && (
+//               <div
+//                 className={`absolute right-0 mt-2 w-80 rounded-lg shadow-lg ${
+//                   theme === "dark"
+//                     ? "bg-gray-800 border border-gray-700"
+//                     : "bg-white border border-gray-200"
+//                 } overflow-hidden`}
+//               >
+//                 <div
+//                   className={`px-4 py-3 border-b ${
+//                     theme === "dark" ? "border-gray-700" : "border-gray-200"
+//                   }`}
+//                 >
+//                   <h3 className="font-semibold">Notifications</h3>
+//                 </div>
+//                 <div className="max-h-96 overflow-y-auto">
+//                   {notifications.map((notif) => (
+//                     <div
+//                       key={notif.id}
+//                       className={`px-4 py-3 hover:bg-opacity-5 ${
+//                         theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
+//                       } cursor-pointer`}
+//                     >
+//                       <p className="text-sm">{notif.text}</p>
+//                       <p
+//                         className={`text-xs mt-1 ${
+//                           theme === "dark" ? "text-gray-400" : "text-gray-500"
+//                         }`}
+//                       >
+//                         {notif.time}
+//                       </p>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </div>
+//             )}
+//           </div>
+
+//           {/* Profile Menu */}
+//           <div className="relative">
+//             <button
+//               onClick={() => setShowProfile(!showProfile)}
+//               className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold"
+//             >
+//               {user?.username.charAt(0).toUpperCase()}
+//             </button>
+
+//             {showProfile && (
+//               <div
+//                 className={`absolute right-0 mt-2 w-56 rounded-lg shadow-lg ${
+//                   theme === "dark"
+//                     ? "bg-gray-800 border border-gray-700"
+//                     : "bg-white border border-gray-200"
+//                 } overflow-hidden`}
+//               >
+//                 <div
+//                   className={`px-4 py-3 border-b ${
+//                     theme === "dark" ? "border-gray-700" : "border-gray-200"
+//                   }`}
+//                 >
+//                   <p className="font-semibold">{user?.fullName}</p>
+//                   <p
+//                     className={`text-sm ${
+//                       theme === "dark" ? "text-gray-400" : "text-gray-500"
+//                     }`}
+//                   >
+//                     {user?.email}
+//                   </p>
+//                 </div>
+//                 <button
+//                   className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
+//                     theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
+//                   }`}
+//                 >
+//                   <User className="w-4 h-4 inline mr-2" />
+//                   {user?.username}
+//                 </button>
+//                 <button
+//                   className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
+//                     theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
+//                   }`}
+//                 >
+//                   <Settings className="w-4 h-4 inline mr-2" />
+//                   Settings
+//                 </button>
+//                 <div
+//                   className={`border-t ${
+//                     theme === "dark" ? "border-gray-700" : "border-gray-200"
+//                   }`}
+//                 >
+//                   <button
+//                     className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
+//                       theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
+//                     }`}
+//                     onClick={() => logOutHandler()}
+//                   >
+//                     Sign out
+//                   </button>
+//                 </div>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//     </nav>
+//   );
+// };
+
+interface NavbarProps {
+  theme: 'dark' | 'light';
+  toggleTheme: () => void;
+  isMobile: boolean;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ theme, toggleTheme, isMobile }) => {
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
-    <nav
-      className={`sticky top-0 z-50 ${
-        theme === "dark"
-          ? "bg-gray-900 border-gray-800"
-          : "bg-white border-gray-200"
-      } border-b`}
-    >
-      <div className="flex items-center justify-between px-4 py-3">
-        {/* Left: Logo & Search */}
-        <div className="flex items-center gap-4 flex-1">
+    <nav className={`sticky top-0 z-50 ${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} border-b`}>
+      <div className="flex items-center justify-between px-4 h-16">
+        {/* Left: Logo */}
+        <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <PlaySquare
-              className={`w-8 h-8 ${
-                theme === "dark" ? "text-red-500" : "text-red-600"
-              }`}
-            />
+            <Video className={`w-8 h-8 ${theme === 'dark' ? 'text-blue-500' : 'text-blue-600'}`} />
             <span className="text-xl font-bold hidden sm:block">VideoHub</span>
           </div>
+        </div>
 
-          <div className="flex-1 max-w-2xl">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className={`w-full px-4 py-2 pl-10 rounded-full ${
-                  theme === "dark"
-                    ? "bg-gray-800 text-white placeholder-gray-400 focus:bg-gray-700"
-                    : "bg-gray-100 text-gray-900 placeholder-gray-500 focus:bg-gray-200"
-                } focus:outline-none transition-colors`}
-              />
-              <Search
-                className={`absolute left-3 top-2.5 w-5 h-5 ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
-                }`}
-              />
-            </div>
+        {/* Center: Search (hidden on mobile) */}
+        <div className="hidden md:flex flex-1 max-w-2xl mx-4">
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Search videos..."
+              className={`w-full px-4 py-2 rounded-full border ${
+                theme === 'dark'
+                  ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
+                  : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            />
+            <Search className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
           </div>
         </div>
 
         {/* Right: Actions */}
         <div className="flex items-center gap-3">
-          {/* Upload Button */}
           <button
-            onClick={() => navigate("/upload")}
-            className={`p-2 rounded-full hover:bg-opacity-10 ${
-              theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-            } transition-colors`}
+            onClick={toggleTheme}
+            className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
           >
-            <Upload className="w-6 h-6" />
+            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
+          
+          {!isMobile && (
+            <>
+              <button className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}>
+                <Upload className="w-5 h-5" />
+              </button>
+              <button className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}>
+                <Bell className="w-5 h-5" />
+              </button>
+            </>
+          )}
 
-          {/* Notifications */}
           <div className="relative">
             <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className={`p-2 rounded-full hover:bg-opacity-10 ${
-                theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-              } transition-colors relative`}
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className={`p-1 rounded-full ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
             >
-              <Bell className="w-6 h-6" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <img
+                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
+                alt="User"
+                className="w-8 h-8 rounded-full"
+              />
             </button>
-
-            {showNotifications && (
-              <div
-                className={`absolute right-0 mt-2 w-80 rounded-lg shadow-lg ${
-                  theme === "dark"
-                    ? "bg-gray-800 border border-gray-700"
-                    : "bg-white border border-gray-200"
-                } overflow-hidden`}
-              >
-                <div
-                  className={`px-4 py-3 border-b ${
-                    theme === "dark" ? "border-gray-700" : "border-gray-200"
-                  }`}
-                >
-                  <h3 className="font-semibold">Notifications</h3>
-                </div>
-                <div className="max-h-96 overflow-y-auto">
-                  {notifications.map((notif) => (
-                    <div
-                      key={notif.id}
-                      className={`px-4 py-3 hover:bg-opacity-5 ${
-                        theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-                      } cursor-pointer`}
-                    >
-                      <p className="text-sm">{notif.text}</p>
-                      <p
-                        className={`text-xs mt-1 ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-500"
-                        }`}
-                      >
-                        {notif.time}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Profile Menu */}
-          <div className="relative">
-            <button
-              onClick={() => setShowProfile(!showProfile)}
-              className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold"
-            >
-              {user?.username.charAt(0).toUpperCase()}
-            </button>
-
-            {showProfile && (
-              <div
-                className={`absolute right-0 mt-2 w-56 rounded-lg shadow-lg ${
-                  theme === "dark"
-                    ? "bg-gray-800 border border-gray-700"
-                    : "bg-white border border-gray-200"
-                } overflow-hidden`}
-              >
-                <div
-                  className={`px-4 py-3 border-b ${
-                    theme === "dark" ? "border-gray-700" : "border-gray-200"
-                  }`}
-                >
-                  <p className="font-semibold">{user?.fullName}</p>
-                  <p
-                    className={`text-sm ${
-                      theme === "dark" ? "text-gray-400" : "text-gray-500"
-                    }`}
-                  >
-                    {user?.email}
-                  </p>
-                </div>
-                <button
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
-                    theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-                  }`}
-                >
-                  <User className="w-4 h-4 inline mr-2" />
-                  {user?.username}
-                </button>
-                <button
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
-                    theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-                  }`}
-                >
-                  <Settings className="w-4 h-4 inline mr-2" />
+            
+            {showUserMenu && (
+              <div className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+                <button className={`w-full px-4 py-2 text-left flex items-center gap-2 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                  <Settings className="w-4 h-4" />
                   Settings
                 </button>
-                <div
-                  className={`border-t ${
-                    theme === "dark" ? "border-gray-700" : "border-gray-200"
-                  }`}
-                >
-                  <button
-                    className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
-                      theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-                    }`}
-                    onClick={() => logOutHandler()}
-                  >
-                    Sign out
-                  </button>
-                </div>
+                <button className={`w-full px-4 py-2 text-left flex items-center gap-2 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} text-red-500`}>
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Search */}
+      <div className="md:hidden px-4 pb-3">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search..."
+            className={`w-full px-4 py-2 rounded-full border ${
+              theme === 'dark'
+                ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
+                : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
+            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          />
+          <Search className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
         </div>
       </div>
     </nav>

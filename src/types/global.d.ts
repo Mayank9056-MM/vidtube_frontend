@@ -9,3 +9,13 @@ export interface User {
     createdAt: string;
     updatedAt: string;
 }
+
+  export interface Video {
+    id: number;
+    thumbnail: string;
+    title: string;
+    channel: string;
+    views: string;
+    time: string;
+    duration: string;
+  };
