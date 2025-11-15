@@ -28,7 +28,6 @@ export const loginUserApi = async (data: LoginUserData) => {
   try {
     logger.debug("data from loginUser",data)
     const res = await axiosInstance.post("/api/v1/users/login", data);
-    logger.info("res from login user api => ", res);
     return res.data;
   } catch (error: any) {
     logger.warn("error in login user api", error);
