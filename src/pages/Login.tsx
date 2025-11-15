@@ -10,10 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye, EyeOff, LogIn, Moon, Sun } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/app/hooks";
-import { toggleTheme } from "@/features/user/userSlice";
 import type { RootState } from "@/app/store";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -60,33 +59,76 @@ export default function Login() {
   return (
     <div className={theme === "dark" ? "dark" : ""}>
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-red-50 dark:from-black dark:via-gray-950 dark:to-red-950/20 p-4 lg:p-8 transition-colors duration-500">
-
         {/* Main Container */}
         <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
           {/* Left Side - Branding & Illustration */}
           <div className="w-full lg:w-1/2 flex flex-col items-center justify-center space-y-6 lg:space-y-8 order-1 lg:order-1">
             {/* Logo */}
             <div className="flex items-center justify-center mb-4 lg:mb-0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 512 512" role="img" aria-labelledby="title desc" className="drop-shadow-2xl animate-fade-in">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="128"
+                height="128"
+                viewBox="0 0 512 512"
+                role="img"
+                aria-labelledby="title desc"
+                className="drop-shadow-2xl animate-fade-in"
+              >
                 <title id="title">Vidtube Logo</title>
-                <desc id="desc">Red rounded-square icon with a white play button and a stylized bird representing video + tweets.</desc>
+                <desc id="desc">
+                  Red rounded-square icon with a white play button and a
+                  stylized bird representing video + tweets.
+                </desc>
                 <defs>
                   <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-                    <stop offset="0" stopColor="#ff3b30"/>
-                    <stop offset="1" stopColor="#c0122a"/>
+                    <stop offset="0" stopColor="#ff3b30" />
+                    <stop offset="1" stopColor="#c0122a" />
                   </linearGradient>
-                  <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feDropShadow dx="0" dy="6" stdDeviation="12" floodColor="#000" floodOpacity="0.12"/>
+                  <filter
+                    id="shadow"
+                    x="-50%"
+                    y="-50%"
+                    width="200%"
+                    height="200%"
+                  >
+                    <feDropShadow
+                      dx="0"
+                      dy="6"
+                      stdDeviation="12"
+                      floodColor="#000"
+                      floodOpacity="0.12"
+                    />
                   </filter>
                 </defs>
-                <rect x="24" y="24" width="464" height="464" rx="88" fill="url(#g)" filter="url(#shadow)"/>
+                <rect
+                  x="24"
+                  y="24"
+                  width="464"
+                  height="464"
+                  rx="88"
+                  fill="url(#g)"
+                  filter="url(#shadow)"
+                />
                 <g transform="translate(140,124) scale(0.9)">
-                  <path d="M86 36.5C92.1 40 96 46.9 96 54.7V213.3C96 221.1 92.1 228 86 231.5C78.9 235 69.7 232.6 63.9 226.8L13.8 176.7C8.0 170.9 8.0 160.1 13.8 154.3L63.9 104.2C69.7 98.4 78.9 96 86 99.5Z" fill="#ffffff"/>
+                  <path
+                    d="M86 36.5C92.1 40 96 46.9 96 54.7V213.3C96 221.1 92.1 228 86 231.5C78.9 235 69.7 232.6 63.9 226.8L13.8 176.7C8.0 170.9 8.0 160.1 13.8 154.3L63.9 104.2C69.7 98.4 78.9 96 86 99.5Z"
+                    fill="#ffffff"
+                  />
                 </g>
                 <g transform="translate(300,120) scale(0.82)">
-                  <path d="M58.9 11.7c-2.1 0.9-4.3 1.5-6.6 1.8 2.4-1.4 4.3-3.6 5.2-6.3-2.3 1.4-4.9 2.4-7.6 3-2.2-2.3-5.3-3.7-8.8-3.7-6.7 0-12.1 5.4-12.1 12.1 0 0.95 0.11 1.88 0.31 2.77-10.05-0.5-18.96-5.32-24.94-12.62-1.04 1.79-1.63 3.86-1.63 6.08 0 4.19 2.13 7.9 5.36 10.07-1.98-0.062-3.84-0.61-5.46-1.51v0.15c0 5.85 4.17 10.74 9.71 11.85-1.02 0.28-2.09 0.43-3.2 0.43-0.78 0-1.54-0.075-2.28-0.21 1.55 4.79 6.05 8.28 11.39 8.38-4.18 3.27-9.46 5.22-15.19 5.22-0.99 0-1.97-0.058-2.93-0.17 5.42 3.47 11.86 5.49 18.77 5.49 22.52 0 34.86-18.66 34.86-34.86 0-0.53-0.012-1.06-0.036-1.58 2.4-1.72 4.48-3.86 6.13-6.31-2.19 0.97-4.55 1.62-7.02 1.91z" fill="#fff"/>
+                  <path
+                    d="M58.9 11.7c-2.1 0.9-4.3 1.5-6.6 1.8 2.4-1.4 4.3-3.6 5.2-6.3-2.3 1.4-4.9 2.4-7.6 3-2.2-2.3-5.3-3.7-8.8-3.7-6.7 0-12.1 5.4-12.1 12.1 0 0.95 0.11 1.88 0.31 2.77-10.05-0.5-18.96-5.32-24.94-12.62-1.04 1.79-1.63 3.86-1.63 6.08 0 4.19 2.13 7.9 5.36 10.07-1.98-0.062-3.84-0.61-5.46-1.51v0.15c0 5.85 4.17 10.74 9.71 11.85-1.02 0.28-2.09 0.43-3.2 0.43-0.78 0-1.54-0.075-2.28-0.21 1.55 4.79 6.05 8.28 11.39 8.38-4.18 3.27-9.46 5.22-15.19 5.22-0.99 0-1.97-0.058-2.93-0.17 5.42 3.47 11.86 5.49 18.77 5.49 22.52 0 34.86-18.66 34.86-34.86 0-0.53-0.012-1.06-0.036-1.58 2.4-1.72 4.48-3.86 6.13-6.31-2.19 0.97-4.55 1.62-7.02 1.91z"
+                    fill="#fff"
+                  />
                 </g>
-                <ellipse cx="148" cy="90" rx="56" ry="20" fill="#ffffff" opacity="0.06"/>
+                <ellipse
+                  cx="148"
+                  cy="90"
+                  rx="56"
+                  ry="20"
+                  fill="#ffffff"
+                  opacity="0.06"
+                />
               </svg>
             </div>
 
@@ -249,11 +291,17 @@ export default function Login() {
             {/* Bottom Text */}
             <p className="text-center text-xs text-gray-500 dark:text-gray-500 mt-6">
               By continuing, you agree to VidTube's{" "}
-              <a href="#" className="text-red-600 dark:text-red-400 hover:underline">
+              <a
+                href="#"
+                className="text-red-600 dark:text-red-400 hover:underline"
+              >
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a href="#" className="text-red-600 dark:text-red-400 hover:underline">
+              <a
+                href="#"
+                className="text-red-600 dark:text-red-400 hover:underline"
+              >
                 Privacy Policy
               </a>
             </p>
