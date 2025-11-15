@@ -8,7 +8,7 @@ export const useDebouncedCallback = <T extends (...args: any[]) => void>(
   callback: T,
   delay: number
 ) => {
-  const timeoutRef = useRef<NODEJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout>()
 
   const debouncedFn = useCallback(
     (...args: Parameters<T>) => {
