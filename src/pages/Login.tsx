@@ -60,18 +60,6 @@ export default function Login() {
   return (
     <div className={theme === "dark" ? "dark" : ""}>
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-red-50 dark:from-black dark:via-gray-950 dark:to-red-950/20 p-4 lg:p-8 transition-colors duration-500">
-        {/* Theme Toggle Button */}
-        <button
-          onClick={() => dispatch(toggleTheme())}
-          className="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-900 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-800 hover:scale-110"
-          aria-label="Toggle theme"
-        >
-          {theme === "dark" ? (
-            <Sun className="w-5 h-5 text-red-500" />
-          ) : (
-            <Moon className="w-5 h-5 text-gray-700" />
-          )}
-        </button>
 
         {/* Main Container */}
         <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
