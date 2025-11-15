@@ -36,14 +36,14 @@ export default function Login() {
   } = useForm<LoginUserData>();
 
   const onSubmit = async (data: LoginUserData) => {
-    logger.info("data from login page", data);
-    console.log(data);
+    
     const res = await dispatch(loginUser(data));
     if (loginUser.fulfilled.match(res)) {
       showSuccess("Login successful 🎉");
       navigate("/home");
     } else {
-      showError(res.message || "Invalid credentials");
+      console.error(res)
+      showError(res?.message || "Invalid credentials");
     }
   };
 
