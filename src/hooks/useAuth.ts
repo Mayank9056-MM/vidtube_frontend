@@ -4,6 +4,18 @@ import { fetchCurrentUser, refreshAccessToken, LogoutUser } from "@/features/use
 import { useNavigate } from "react-router-dom";
 import { logger } from "@/utls/logger";
 
+/**
+ * Hook to provide authentication state and functions.
+ *
+ * @returns {{
+ *   user: User | null,
+ *   isAuthenticated: boolean,
+ *   initialized: boolean,
+ *   loading: boolean,
+ *   tokenRefreshing: boolean,
+ *   logout: () => Promise<void>
+ * }}
+ */
 export const useAuth = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();

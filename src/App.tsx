@@ -7,6 +7,19 @@ import { AppRoutes } from "./routes/AppRoutes";
 import { Button } from "./components/ui/button";
 import { Moon, Sun } from "lucide-react";
 
+/**
+ * The main App component.
+ *
+ * This component is responsible for rendering the entire app,
+ * including the theme toggle button and the routes.
+ *
+ * It uses the `useAppDispatch` and `useAppSelector` hooks from
+ * `react-redux` to get the current theme and dispatch the
+ * `toggleTheme` action.
+ *
+ * It also uses the `useEffect` hook from `react` to toggle the "dark"
+ * class on the document element when the theme changes.
+ */
 const App = () => {
   // const currUser = useState(null);
   const dispatch = useAppDispatch();
