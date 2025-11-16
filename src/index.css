@@ -119,16 +119,18 @@
   }
 }
 
- /* hide scrollbar  */
-html, body {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+/* Hide scrollbar everywhere */
+* {
+  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none;      /* IE and Edge */
 }
 
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  display: none;
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;                 /* Chrome, Safari, Edge */
 }
+
 
 /* loader style  */
 

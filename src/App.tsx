@@ -35,7 +35,7 @@ const App = () => {
         theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"
       }`}
     >
-      <Button
+      {/* <Button
         variant="outline"
         size="icon"
         className="absolute top-4 right-4 rounded-full"
@@ -46,7 +46,7 @@ const App = () => {
         ) : (
           <Moon className="h-5 w-5" />
         )}
-      </Button>
+      </Button> */}
       {/* rest of your routes/components */}
       <AppRoutes />
     </div>
