@@ -91,7 +91,7 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = action.payload.data.user;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -159,7 +159,6 @@ const userSlice = createSlice({
         state.loading = false;
         state.user = null;
         state.successMessage = "Logged out successfully";
-       
       })
       .addCase(LogoutUser.rejected, (state, action) => {
         state.loading = false;

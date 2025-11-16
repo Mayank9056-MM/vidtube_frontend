@@ -50,9 +50,9 @@ export const loginUser = createAsyncThunk<
       ? { email: data.emailOrUsername, password: data.password }
       : { username: data.emailOrUsername, password: data.password };
     const res = await loginUserApi(payload);
-    return res.data;
+    return res;
   } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || error.message);
+    return rejectWithValue(error.response?.data?.message || error.message || "Login Failed");
   }
 });
 
