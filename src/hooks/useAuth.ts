@@ -10,7 +10,7 @@ export const useAuth = () => {
 
   const { user, loading, tokenRefreshing } = useAppSelector((state) => state.user);
 
-  logger.info("user from useAuth",user)
+  // logger.info("user from useAuth",user)
   // logger.info("loading from useAuth",loading)
   // logger.info("tokenRefershing",tokenRefreshing)
 

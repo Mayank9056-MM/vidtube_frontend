@@ -14,8 +14,8 @@ import { logger } from "@/utls/logger";
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated, initialized, loading } = useAuth();
 
-  logger.info(isAuthenticated, "isAuthenticated");
-  logger.info(initialized, "initialized");
+  // logger.info(isAuthenticated, "isAuthenticated");
+  // logger.info(initialized, "initialized");
 
   if (!initialized || loading) {
     return <Loader />;
