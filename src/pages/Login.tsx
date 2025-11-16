@@ -20,6 +20,7 @@ import type { LoginUserData } from "../api/userApi.types";
 import { loginUser } from "@/features/user/userThunks";
 import { useToast } from "@/hooks/useToast";
 import { logger } from "@/utls/logger";
+import "../index.css"
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -308,30 +309,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        .animate-gradient {
-          background-size: 200% auto;
-          animation: gradient 3s ease infinite;
-        }
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out;
-        }
-      `}</style>
     </div>
   );
 }
