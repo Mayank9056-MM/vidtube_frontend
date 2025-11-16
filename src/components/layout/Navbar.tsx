@@ -1,198 +1,149 @@
-import React, { useState } from "react";
-import { Search, Upload, Bell, PlaySquare, Settings, User } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/app/store";
+import { toggleSidebar } from "@/features/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
-import { LogoutUser } from "@/features/user/userThunks";
+import {
+  Menu,
+  Search,
+  Mic,
+  Bell,
+  Plus,
+  X,
+} from "lucide-react";
+import { useState } from "react";
 
-// Navbar Component
 export const Navbar = () => {
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
-  const { theme, user, loading, error } = useAppSelector(
-    (state: RootState) => state.user
-  );
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-
-  const notifications = [
-    { id: 1, text: "New comment on your video", time: "2m ago" },
-    { id: 2, text: "Someone liked your post", time: "1h ago" },
-    { id: 3, text: "New subscriber!", time: "3h ago" },
-  ];
-
-  const logOutHandler = async () => {
-    await dispatch(LogoutUser());
-  };
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
-    <nav
-      className={`sticky top-0 z-50 ${
-        theme === "dark"
-          ? "bg-gray-900 border-gray-800"
-          : "bg-white border-gray-200"
-      } border-b`}
-    >
-      <div className="flex items-center justify-between px-4 py-3">
-        {/* Left: Logo & Search */}
-        <div className="flex items-center gap-4 flex-1">
-          <div className="flex items-center gap-2">
-            <PlaySquare
-              className={`w-8 h-8 ${
-                theme === "dark" ? "text-red-500" : "text-red-600"
-              }`}
-            />
-            <span className="text-xl font-bold hidden sm:block">VideoHub</span>
-          </div>
+    <header className="sticky top-0 z-50 flex items-center justify-between px-2 sm:px-4 py-2 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm">
+      {/* Left Side - Hamburger + Logo */}
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+        <button
+          onClick={() => dispatch(toggleSidebar())}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors flex-shrink-0"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300" />
+        </button>
 
-          <div className="flex-1 max-w-2xl">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className={`w-full px-4 py-2 pl-10 rounded-full ${
-                  theme === "dark"
-                    ? "bg-gray-800 text-white placeholder-gray-400 focus:bg-gray-700"
-                    : "bg-gray-100 text-gray-900 placeholder-gray-500 focus:bg-gray-200"
-                } focus:outline-none transition-colors`}
-              />
-              <Search
-                className={`absolute left-3 top-2.5 w-5 h-5 ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
-                }`}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Right: Actions */}
-        <div className="flex items-center gap-3">
-          {/* Upload Button */}
-          <button
-            onClick={() => navigate("/upload")}
-            className={`p-2 rounded-full hover:bg-opacity-10 ${
-              theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-            } transition-colors`}
+        <div 
+          className="flex items-center gap-1 sm:gap-2 cursor-pointer flex-shrink-0"
+          onClick={() => navigate("/home")}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 512 512"
+            className="sm:w-9 sm:h-9"
           >
-            <Upload className="w-6 h-6" />
-          </button>
-
-          {/* Notifications */}
-          <div className="relative">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className={`p-2 rounded-full hover:bg-opacity-10 ${
-                theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-              } transition-colors relative`}
-            >
-              <Bell className="w-6 h-6" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-
-            {showNotifications && (
-              <div
-                className={`absolute right-0 mt-2 w-80 rounded-lg shadow-lg ${
-                  theme === "dark"
-                    ? "bg-gray-800 border border-gray-700"
-                    : "bg-white border border-gray-200"
-                } overflow-hidden`}
-              >
-                <div
-                  className={`px-4 py-3 border-b ${
-                    theme === "dark" ? "border-gray-700" : "border-gray-200"
-                  }`}
-                >
-                  <h3 className="font-semibold">Notifications</h3>
-                </div>
-                <div className="max-h-96 overflow-y-auto">
-                  {notifications.map((notif) => (
-                    <div
-                      key={notif.id}
-                      className={`px-4 py-3 hover:bg-opacity-5 ${
-                        theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-                      } cursor-pointer`}
-                    >
-                      <p className="text-sm">{notif.text}</p>
-                      <p
-                        className={`text-xs mt-1 ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-500"
-                        }`}
-                      >
-                        {notif.time}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Profile Menu */}
-          <div className="relative">
-            <button
-              onClick={() => setShowProfile(!showProfile)}
-              className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold"
-            >
-              {user?.username.charAt(0).toUpperCase()}
-            </button>
-
-            {showProfile && (
-              <div
-                className={`absolute right-0 mt-2 w-56 rounded-lg shadow-lg ${
-                  theme === "dark"
-                    ? "bg-gray-800 border border-gray-700"
-                    : "bg-white border border-gray-200"
-                } overflow-hidden`}
-              >
-                <div
-                  className={`px-4 py-3 border-b ${
-                    theme === "dark" ? "border-gray-700" : "border-gray-200"
-                  }`}
-                >
-                  <p className="font-semibold">{user?.fullName}</p>
-                  <p
-                    className={`text-sm ${
-                      theme === "dark" ? "text-gray-400" : "text-gray-500"
-                    }`}
-                  >
-                    {user?.email}
-                  </p>
-                </div>
-                <button
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
-                    theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-                  }`}
-                >
-                  <User className="w-4 h-4 inline mr-2" />
-                  {user?.username}
-                </button>
-                <button
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
-                    theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-                  }`}
-                >
-                  <Settings className="w-4 h-4 inline mr-2" />
-                  Settings
-                </button>
-                <div
-                  className={`border-t ${
-                    theme === "dark" ? "border-gray-700" : "border-gray-200"
-                  }`}
-                >
-                  <button
-                    className={`w-full px-4 py-2 text-left text-sm hover:bg-opacity-5 ${
-                      theme === "dark" ? "hover:bg-gray-500" : "hover:bg-black"
-                    }`}
-                    onClick={() => logOutHandler()}
-                  >
-                    Sign out
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+            <defs>
+              <linearGradient id="nav-grad" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0" stopColor="#ff3b30" />
+                <stop offset="1" stopColor="#c0122a" />
+              </linearGradient>
+            </defs>
+            <rect x="24" y="24" width="464" height="464" rx="88" fill="url(#nav-grad)" />
+            <g transform="translate(140,124) scale(0.9)">
+              <path
+                d="M86 36.5C92.1 40 96 46.9 96 54.7V213.3C96 221.1 92.1 228 86 231.5C78.9 235 69.7 232.6 63.9 226.8L13.8 176.7C8.0 170.9 8.0 160.1 13.8 154.3L63.9 104.2C69.7 98.4 78.9 96 86 99.5Z"
+                fill="#ffffff"
+              />
+            </g>
+            <g transform="translate(300,120) scale(0.82)">
+              <path
+                d="M58.9 11.7c-2.1 0.9-4.3 1.5-6.6 1.8 2.4-1.4 4.3-3.6 5.2-6.3-2.3 1.4-4.9 2.4-7.6 3-2.2-2.3-5.3-3.7-8.8-3.7-6.7 0-12.1 5.4-12.1 12.1 0 0.95 0.11 1.88 0.31 2.77-10.05-0.5-18.96-5.32-24.94-12.62-1.04 1.79-1.63 3.86-1.63 6.08 0 4.19 2.13 7.9 5.36 10.07-1.98-0.062-3.84-0.61-5.46-1.51v0.15c0 5.85 4.17 10.74 9.71 11.85-1.02 0.28-2.09 0.43-3.2 0.43-0.78 0-1.54-0.075-2.28-0.21 1.55 4.79 6.05 8.28 11.39 8.38-4.18 3.27-9.46 5.22-15.19 5.22-0.99 0-1.97-0.058-2.93-0.17 5.42 3.47 11.86 5.49 18.77 5.49 22.52 0 34.86-18.66 34.86-34.86 0-0.53-0.012-1.06-0.036-1.58 2.4-1.72 4.48-3.86 6.13-6.31-2.19 0.97-4.55 1.62-7.02 1.91z"
+                fill="#fff"
+              />
+            </g>
+          </svg>
+          <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white hidden xs:block">
+            VidTube
+          </span>
         </div>
       </div>
-    </nav>
+
+      {/* Center - Search Bar (Desktop & Tablet) */}
+      <div className="hidden md:flex items-center flex-1 max-w-2xl mx-4">
+        <div className="flex items-center w-full">
+          <div className="flex items-center flex-1 border border-gray-300 dark:border-gray-700 rounded-l-full overflow-hidden focus-within:border-red-500 dark:focus-within:border-red-500 transition-colors">
+            <input
+              type="text"
+              placeholder="Search"
+              className="flex-1 px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none text-sm"
+            />
+          </div>
+          <button className="px-4 sm:px-6 py-2 bg-gray-100 dark:bg-gray-800 border border-l-0 border-gray-300 dark:border-gray-700 rounded-r-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+            <Search className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          </button>
+        </div>
+        <button className="ml-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+          <Mic className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+        </button>
+      </div>
+
+      {/* Right - Actions */}
+      <div className="flex items-center gap-1 sm:gap-2">
+        {/* Mobile Search Toggle */}
+        <button 
+          className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+        >
+          <Search className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        </button>
+
+        <button 
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors hidden sm:block"
+          onClick={() => navigate("/upload")}
+        >
+          <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300" />
+        </button>
+        
+        <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors relative">
+          <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full"></span>
+        </button>
+        
+        <button 
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+          onClick={() => navigate("/profile")}
+        >
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-semibold">
+            A
+          </div>
+        </button>
+      </div>
+
+      {/* Mobile Search Overlay */}
+      {isSearchOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 p-4 shadow-lg">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsSearchOpen(false)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            </button>
+            <div className="flex items-center flex-1">
+              <input
+                type="text"
+                placeholder="Search"
+                autoFocus
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-l-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-red-500 dark:focus:border-red-500 text-sm"
+              />
+              <button className="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-l-0 border-gray-300 dark:border-gray-700 rounded-r-full">
+                <Search className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              </button>
+            </div>
+            <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+              <Mic className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            </button>
+          </div>
+        </div>
+      )}
+    </header>
   );
 };
