@@ -22,7 +22,7 @@ const App = () => {
         // SET initialized FIRST
         dispatch({ type: "user/markInitialized" });
 
-        // await dispatch(fetchCurrentUser());
+        await dispatch(fetchCurrentUser());
         logger.info("call fetch 2 current user", initialized);
       } catch (error) {
         logger.info("No active session found", error);
