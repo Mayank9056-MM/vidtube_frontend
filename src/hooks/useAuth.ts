@@ -1,70 +1,53 @@
-import { useEffect, useState, useCallback } from "react";
+// src/hooks/useAuth.ts
+import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { fetchCurrentUser, refreshAccessToken, LogoutUser } from "@/features/user/userThunks";
+import { refreshAccessToken, LogoutUser } from "@/features/user/userThunks";
 import { useNavigate } from "react-router-dom";
 import { logger } from "@/utls/logger";
 
-/**
- * Hook to provide authentication state and functions.
- *
- * @returns {{
- *   user: User | null,
- *   isAuthenticated: boolean,
- *   initialized: boolean,
- *   loading: boolean,
- *   tokenRefreshing: boolean,
- *   logout: () => Promise<void>
- * }}
- */
 export const useAuth = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { user, loading, tokenRefreshing } = useAppSelector((state) => state.user);
+  const { user, loading, tokenRefreshing, initialized } = useAppSelector(
+    (state) => state.user
+  );
 
-  // logger.info("user from useAuth",user)
-  // logger.info("loading from useAuth",loading)
-  // logger.info("tokenRefershing",tokenRefreshing)
+  logger.info(
+    "user => ",
+    user,
+    "\nloading => ",
+    loading,
+    "\ntokenRefreshing => ",
+    tokenRefreshing,
+    "initialized => ",
+    initialized
+  );
 
-  const [initialized, setInitialized] = useState(false);
-
-  // Fetch the current user from cookie-based session
+  // Auto token refresh (only if user is logged in)
   useEffect(() => {
-    const init = async () => {
-      try {
-        await dispatch(fetchCurrentUser()).unwrap();
-      } catch (err) {
-        logger.warn("No active session found:", err);
-      } finally {
-        setInitialized(true);
-      }
-    };
+    if (!user) return; // prevent refreshing if logged out
 
-    if (!user) init();
-    else setInitialized(true);
-  }, [dispatch, user]);
-
-  // Periodic token refresh (every 10 min)
-  useEffect(() => {
     const interval = setInterval(() => {
       dispatch(refreshAccessToken());
     }, 10 * 60 * 1000);
+
     return () => clearInterval(interval);
-  }, [dispatch]);
+  }, [user, dispatch]);
 
   const logout = useCallback(async () => {
     try {
       await dispatch(LogoutUser()).unwrap();
       navigate("/login", { replace: true });
     } catch (err) {
-      logger.error("Logout failed:", err);
+      console.error("Logout failed:", err);
     }
   }, [dispatch, navigate]);
 
   return {
     user,
     isAuthenticated: !!user,
-    initialized,
+    initialized, 
     loading,
     tokenRefreshing,
     logout,
