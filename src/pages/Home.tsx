@@ -4,6 +4,7 @@ import type { RootState } from "@/app/store";
 import { CheckCircle, MoreVertical, Loader2 } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { VideoCard } from "@/components/layout/VideoCard";
+import { getAllVideos } from "@/features/video/videoThunks";
 
 // Assuming you have this thunk in your video slice
 // import { fetchAllVideos } from "@/features/video/videoThunks";
@@ -45,7 +46,7 @@ export default function Home() {
     };
 
     // Dispatch your fetch action here
-    // await dispatch(fetchAllVideos(params));
+    await dispatch(getAllVideos());
   };
 
   const categories = [

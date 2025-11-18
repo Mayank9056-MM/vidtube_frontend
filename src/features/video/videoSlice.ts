@@ -69,7 +69,7 @@ const videoSlice = createSlice({
       })
       .addCase(getAllVideos.fulfilled, (state, action) => {
         state.loading = false;
-        state.videos = action.payload.data || action.payload;
+        state.videos = action.payload.allVideo || action.payload;
       })
       .addCase(getAllVideos.rejected, (state, action) => {
         state.loading = false;

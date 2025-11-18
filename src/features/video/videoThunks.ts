@@ -8,6 +8,7 @@ import {
   getAllVideosApi,
 } from "@/api/videoApi";
 import type { publishVideoData, updateVideoData } from "@/api/videoApi.types";
+import { logger } from "@/utls/logger";
 
 // Publish Video
 export const publishVideo = createAsyncThunk(
@@ -41,6 +42,7 @@ export const getAllVideos = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await getAllVideosApi();
+      logger.info("videos from all videos",res)
       return res;
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch videos");
