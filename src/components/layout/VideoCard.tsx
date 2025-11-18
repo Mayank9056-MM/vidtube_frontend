@@ -6,6 +6,7 @@ interface VideoCardProps {
   video: {
     id: number;
     thumbnail: string;
+    avatar: string;
     title: string;
     channel: string;
     views: string;
@@ -30,7 +31,12 @@ export const VideoCard = ({ video }: VideoCardProps) => {
         </div>
       </div>
       <div className="flex gap-3">
-        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex-shrink-0"></div>
+        <img
+          src={video.avatar}
+          alt={video.channel}
+          className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+        />
+
         <div className="flex-1">
           <h3
             className={`font-medium line-clamp-2 mb-1 group-hover:text-blue-500 transition-colors ${
