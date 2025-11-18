@@ -90,7 +90,7 @@ export const getAllVideosApi = async () => {
     const res = await axiosInstance.get(`/api/v1/videos/all-videos`);
 
     logger.info("res from get all videos api => ", res);
-    return res.data;
+    return res.data.data;
   } catch (error: any) {
     logger.warn("error in get all videos api", error);
     return error.message;

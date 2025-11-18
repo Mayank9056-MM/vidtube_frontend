@@ -127,7 +127,7 @@ export const currentUserApi = async () => {
   try {
     const res = await axiosInstance.get("/api/v1/users/current-user");
     logger.info("res from current user api => ", res);
-    return res.data;
+    return res.data.data;
   } catch (error: any) {
     logger.warn("error in current user api", error);
     throw error.message;

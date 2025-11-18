@@ -13,12 +13,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Menu,
   Upload,
   Video,
   Image,
   X,
   CheckCircle,
+  FileVideo,
+  Sparkles,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 
@@ -45,8 +46,11 @@ export default function UploadPage() {
     handleSubmit,
     formState: { errors, isValid },
     reset,
+    watch,
   } = useForm<Omit<PublishVideoData, "video" | "thumbnail">>();
 
+  const title = watch("title");
+  const description = watch("description");
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,7 +90,6 @@ export default function UploadPage() {
     setIsUploading(true);
     setUploadProgress(0);
 
-    // Simulate upload progress
     const interval = setInterval(() => {
       setUploadProgress((prev) => {
         if (prev >= 100) {
@@ -97,14 +100,12 @@ export default function UploadPage() {
       });
     }, 300);
 
-    // Simulate API call
     setTimeout(() => {
       clearInterval(interval);
       setUploadProgress(100);
       setIsUploading(false);
       setUploadSuccess(true);
 
-      // Reset after success
       setTimeout(() => {
         reset();
         removeVideo();
@@ -125,297 +126,275 @@ export default function UploadPage() {
   };
 
   return (
-    <div
-      className={`flex h-screen ${
-        theme === "dark"
-          ? "bg-gray-950 text-white"
-          : "bg-white text-gray-900"
-      }`}
-    >
-
-      {/* Main Area */}
-      <div className="flex flex-col flex-1 overflow-hidden">
-
-        {/* Mobile Menu Button */}
-        <div className="lg:hidden sticky top-[60px] z-40">
-          <button
-            // onClick={toggleSidebar}
-            className={`m-4 p-2 rounded-lg ${
-              theme === "dark"
-                ? "bg-gray-800 hover:bg-gray-700"
-                : "bg-gray-100 hover:bg-gray-200"
-            } transition-colors`}
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-red-50 dark:from-black dark:via-gray-950 dark:to-red-950/20 transition-colors duration-500">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+        {/* Header Section */}
+        <div className="mb-8 sm:mb-10 lg:mb-12 text-center lg:text-left">
+          <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-red-500 to-red-700 dark:from-red-600 dark:to-red-800 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 dark:shadow-red-900/50">
+              <FileVideo className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-red-600 via-red-500 to-red-700 dark:from-red-500 dark:via-red-400 dark:to-red-600 bg-clip-text text-transparent">
+                Upload Video
+              </h1>
+            </div>
+          </div>
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto lg:mx-0">
+            Share your creativity with the world. Upload your video and reach millions of viewers.
+          </p>
         </div>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-2">Upload Video</h1>
-              <p
-                className={`${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                Share your content with the world
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              {/* Video Upload Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Video className="w-5 h-5" />
-                    Video File
-                  </CardTitle>
-                  <CardDescription>
-                    Upload your video file (MP4, MOV, AVI)
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {!videoFile ? (
-                    <label
-                      className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
-                        theme === "dark"
-                          ? "border-gray-700 hover:border-gray-600 hover:bg-gray-800"
-                          : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload
-                          className={`w-12 h-12 mb-4 ${
-                            theme === "dark" ? "text-gray-400" : "text-gray-500"
-                          }`}
-                        />
-                        <p className="mb-2 text-sm font-semibold">
-                          Click to upload video
-                        </p>
-                        <p
-                          className={`text-xs ${
-                            theme === "dark" ? "text-gray-400" : "text-gray-500"
-                          }`}
-                        >
-                          MP4, MOV, or AVI (MAX. 2GB)
-                        </p>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Left Column - Upload Files */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Video Upload Card */}
+            <Card className="border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-xl hover:shadow-2xl transition-all duration-300">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                  <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-lg flex items-center justify-center">
+                    <Video className="w-4 h-4 text-white" />
+                  </div>
+                  Video File
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base">
+                  Upload your video content (MP4, MOV, AVI - Max 2GB)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {!videoFile ? (
+                  <label className="group flex flex-col items-center justify-center w-full h-48 sm:h-56 lg:h-64 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 border-gray-300 hover:border-red-500 dark:border-gray-700 dark:hover:border-red-500 bg-gray-50 hover:bg-red-50/50 dark:bg-gray-950 dark:hover:bg-red-950/30">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-950/50 dark:to-red-900/50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <Upload className="w-8 h-8 sm:w-10 sm:h-10 text-red-600 dark:text-red-400" />
                       </div>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="video/*"
-                        onChange={handleVideoChange}
-                      />
-                    </label>
-                  ) : (
-                    <div className="relative">
-                      <video
-                        src={videoPreview}
-                        controls
-                        className="w-full rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeVideo}
-                        className={`absolute top-2 right-2 p-2 rounded-full ${
-                          theme === "dark"
-                            ? "bg-gray-800 hover:bg-gray-700"
-                            : "bg-white hover:bg-gray-100"
-                        } shadow-lg`}
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                      <div
-                        className={`mt-2 text-sm ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-600"
-                        }`}
-                      >
-                        {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
-                      </div>
+                      <p className="mb-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300">
+                        Click to upload or drag and drop
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                        MP4, MOV, or AVI (MAX. 2GB)
+                      </p>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Thumbnail Upload Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Image className="w-5 h-5" />
-                    Thumbnail
-                  </CardTitle>
-                  <CardDescription>
-                    Upload a custom thumbnail for your video
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {!thumbnailFile ? (
-                    <label
-                      className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
-                        theme === "dark"
-                          ? "border-gray-700 hover:border-gray-600 hover:bg-gray-800"
-                          : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Image
-                          className={`w-10 h-10 mb-4 ${
-                            theme === "dark" ? "text-gray-400" : "text-gray-500"
-                          }`}
-                        />
-                        <p className="mb-2 text-sm font-semibold">
-                          Click to upload thumbnail
-                        </p>
-                        <p
-                          className={`text-xs ${
-                            theme === "dark" ? "text-gray-400" : "text-gray-500"
-                          }`}
-                        >
-                          PNG, JPG, or WEBP (MAX. 5MB)
-                        </p>
-                      </div>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleThumbnailChange}
-                      />
-                    </label>
-                  ) : (
-                    <div className="relative">
-                      <img
-                        src={thumbnailPreview}
-                        alt="Thumbnail preview"
-                        className="w-full rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeThumbnail}
-                        className={`absolute top-2 right-2 p-2 rounded-full ${
-                          theme === "dark"
-                            ? "bg-gray-800 hover:bg-gray-700"
-                            : "bg-white hover:bg-gray-100"
-                        } shadow-lg`}
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                      <div
-                        className={`mt-2 text-sm ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-600"
-                        }`}
-                      >
-                        {thumbnailFile.name}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Video Details Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Video Details</CardTitle>
-                  <CardDescription>
-                    Add title and description for your video
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Title</Label>
-                    <Input
-                      id="title"
-                      placeholder="Enter video title"
-                      {...register("title", {
-                        required: "Title is required",
-                        minLength: {
-                          value: 3,
-                          message: "Title must be at least 3 characters",
-                        },
-                        maxLength: {
-                          value: 100,
-                          message: "Title must not exceed 100 characters",
-                        },
-                      })}
-                      className={errors.title ? "border-red-500" : ""}
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="video/*"
+                      onChange={handleVideoChange}
                     />
-                    {errors.title && (
-                      <p className="text-sm text-red-500">
+                  </label>
+                ) : (
+                  <div className="relative group">
+                    <video
+                      src={videoPreview}
+                      controls
+                      className="w-full rounded-xl shadow-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeVideo}
+                      className="absolute top-3 right-3 p-2 rounded-full bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                    <div className="mt-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50 flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate flex-1">
+                        {videoFile.name}
+                      </span>
+                      <span className="text-xs font-semibold text-red-600 dark:text-red-400 ml-2">
+                        {(videoFile.size / (1024 * 1024)).toFixed(2)} MB
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Thumbnail Upload Card */}
+            <Card className="border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-xl hover:shadow-2xl transition-all duration-300">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-lg flex items-center justify-center">
+                    <Image className="w-4 h-4 text-white" />
+                  </div>
+                  Thumbnail
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base">
+                  Choose an eye-catching thumbnail (PNG, JPG, WEBP - Max 5MB)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {!thumbnailFile ? (
+                  <label className="group flex flex-col items-center justify-center w-full h-40 sm:h-48 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 border-gray-300 hover:border-purple-500 dark:border-gray-700 dark:hover:border-purple-500 bg-gray-50 hover:bg-purple-50/50 dark:bg-gray-950 dark:hover:bg-purple-950/30">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-950/50 dark:to-purple-900/50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <Image className="w-7 h-7 sm:w-8 sm:h-8 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <p className="mb-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300">
+                        Click to upload thumbnail
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                        PNG, JPG, or WEBP (MAX. 5MB)
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleThumbnailChange}
+                    />
+                  </label>
+                ) : (
+                  <div className="relative group">
+                    <img
+                      src={thumbnailPreview}
+                      alt="Thumbnail preview"
+                      className="w-full rounded-xl shadow-lg object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeThumbnail}
+                      className="absolute top-3 right-3 p-2 rounded-full bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-800 text-white shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                    <div className="mt-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate block">
+                        {thumbnailFile.name}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Video Details */}
+          <div className="space-y-6">
+            <Card className="border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-xl sticky top-6">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                  <Sparkles className="w-5 h-5 text-red-600 dark:text-red-400" />
+                  Video Details
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base">
+                  Add engaging title and description
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Title *
+                  </Label>
+                  <Input
+                    id="title"
+                    placeholder="Make it catchy and descriptive..."
+                    {...register("title", {
+                      required: "Title is required",
+                      minLength: {
+                        value: 3,
+                        message: "Title must be at least 3 characters",
+                      },
+                      maxLength: {
+                        value: 100,
+                        message: "Title must not exceed 100 characters",
+                      },
+                    })}
+                    className={`bg-gray-50 dark:bg-gray-950 border-gray-300 dark:border-gray-700 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500 transition-all ${
+                      errors.title ? "border-red-500 dark:border-red-500" : ""
+                    }`}
+                  />
+                  <div className="flex items-center justify-between text-xs">
+                    {errors.title ? (
+                      <p className="text-red-500 flex items-center gap-1">
+                        <span>⚠️</span>
                         {errors.title.message}
                       </p>
+                    ) : (
+                      <span className="text-gray-500 dark:text-gray-400">
+                        {title?.length || 0}/100 characters
+                      </span>
                     )}
                   </div>
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Tell viewers about your video"
-                      rows={6}
-                      {...register("description", {
-                        required: "Description is required",
-                        minLength: {
-                          value: 10,
-                          message: "Description must be at least 10 characters",
-                        },
-                        maxLength: {
-                          value: 5000,
-                          message: "Description must not exceed 5000 characters",
-                        },
-                      })}
-                      className={errors.description ? "border-red-500" : ""}
-                    />
-                    {errors.description && (
-                      <p className="text-sm text-red-500">
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Description *
+                  </Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Tell viewers what your video is about..."
+                    rows={6}
+                    {...register("description", {
+                      required: "Description is required",
+                      minLength: {
+                        value: 10,
+                        message: "Description must be at least 10 characters",
+                      },
+                      maxLength: {
+                        value: 5000,
+                        message: "Description must not exceed 5000 characters",
+                      },
+                    })}
+                    className={`bg-gray-50 dark:bg-gray-950 border-gray-300 dark:border-gray-700 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500 transition-all resize-none ${
+                      errors.description ? "border-red-500 dark:border-red-500" : ""
+                    }`}
+                  />
+                  <div className="flex items-center justify-between text-xs">
+                    {errors.description ? (
+                      <p className="text-red-500 flex items-center gap-1">
+                        <span>⚠️</span>
                         {errors.description.message}
                       </p>
+                    ) : (
+                      <span className="text-gray-500 dark:text-gray-400">
+                        {description?.length || 0}/5000 characters
+                      </span>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              {/* Upload Progress */}
-              {isUploading && (
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Uploading...</span>
-                        <span>{uploadProgress}%</span>
+                {/* Upload Progress */}
+                {isUploading && (
+                  <div className="space-y-3 p-4 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200 dark:border-blue-800">
+                    <div className="flex justify-between items-center text-sm font-medium">
+                      <span className="text-blue-700 dark:text-blue-300">Uploading your video...</span>
+                      <span className="text-blue-600 dark:text-blue-400">{uploadProgress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 h-2.5 rounded-full transition-all duration-300 ease-out"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Success Message */}
+                {uploadSuccess && (
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200 dark:border-green-800">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-green-500 dark:bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="w-6 h-6 text-white" />
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${uploadProgress}%` }}
-                        ></div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-green-700 dark:text-green-300 text-sm">
+                          Upload successful!
+                        </p>
+                        <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                          Your video is being processed and will be live shortly.
+                        </p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+                  </div>
+                )}
 
-              {/* Success Message */}
-              {uploadSuccess && (
-                <Card className="border-green-500">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-3 text-green-600 dark:text-green-400">
-                      <CheckCircle className="w-6 h-6" />
-                      <div>
-                        <p className="font-semibold">Video uploaded successfully!</p>
-                        <p className="text-sm">Your video is now being processed.</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Submit Button */}
-              <div className="flex gap-4">
+                {/* Submit Button */}
                 <Button
                   type="button"
                   onClick={handleSubmit(onSubmit)}
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium"
+                  className="w-full bg-gradient-to-r from-red-600 via-red-500 to-red-700 hover:from-red-700 hover:via-red-600 hover:to-red-800 dark:from-red-500 dark:via-red-600 dark:to-red-700 dark:hover:from-red-600 dark:hover:via-red-700 dark:hover:to-red-800 text-white font-semibold py-6 text-base shadow-lg shadow-red-500/30 dark:shadow-red-900/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   disabled={
                     !videoFile ||
                     !thumbnailFile ||
@@ -426,7 +405,7 @@ export default function UploadPage() {
                 >
                   {isUploading ? (
                     <span className="flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       Uploading...
                     </span>
                   ) : (
@@ -436,10 +415,10 @@ export default function UploadPage() {
                     </span>
                   )}
                 </Button>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );

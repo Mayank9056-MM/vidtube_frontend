@@ -4,6 +4,7 @@ import type { RootState } from "@/app/store";
 import { CheckCircle, MoreVertical, Loader2 } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { VideoCard } from "@/components/layout/VideoCard";
+import { getAllVideos } from "@/features/video/videoThunks";
 
 // Assuming you have this thunk in your video slice
 // import { fetchAllVideos } from "@/features/video/videoThunks";
@@ -45,7 +46,7 @@ export default function Home() {
     };
 
     // Dispatch your fetch action here
-    // await dispatch(fetchAllVideos(params));
+    await dispatch(getAllVideos());
   };
 
   const categories = [
@@ -77,15 +78,27 @@ export default function Home() {
   const formatDate = (date: string) => {
     const now = new Date();
     const videoDate = new Date(date);
-    const diffTime = Math.abs(now.getTime() - videoDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffMs = now.getTime() - videoDate.getTime();
 
+    const diffMinutes = diffMs / (1000 * 60);
+    const diffHours = diffMs / (1000 * 60 * 60);
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMinutes < 1) return "Just now";
+    if (diffMinutes < 60) return `${Math.floor(diffMinutes)} minutes ago`;
+    if (diffHours < 24) return `${Math.floor(diffHours)} hours ago`;
     if (diffDays === 0) return "Today";
     if (diffDays === 1) return "Yesterday";
     if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-    return `${Math.floor(diffDays / 365)} years ago`;
+
+    const diffWeeks = Math.floor(diffDays / 7);
+    if (diffWeeks < 4) return `${diffWeeks} weeks ago`;
+
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths < 12) return `${diffMonths} months ago`;
+
+    const diffYears = Math.floor(diffMonths / 12);
+    return `${diffYears} years ago`;
   };
 
   // Helper function to format duration
@@ -161,11 +174,10 @@ export default function Home() {
                   key={video._id}
                   video={{
                     id: video._id,
-                    thumbnail: video.thumbnail?.url || video.thumbnail,
+                    thumbnail: video.thumbnail,
                     title: video.title,
-                    channel: video.owner?.fullName || video.owner?.username || "Unknown",
-                    channelAvatar:
-                      video.owner?.avatar?.url ||
+                    channel: video.owner?.username || "Unknown",
+                    avatar:
                       video.owner?.avatar ||
                       `https://ui-avatars.com/api/?name=${video.owner?.username}&background=ef4444&color=fff`,
                     views: formatViews(video.views || 0),
@@ -188,11 +200,13 @@ export default function Home() {
             )}
 
             {/* End of Results */}
-            {pagination && page >= pagination.totalPages && videos.length > 0 && (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                <p>You've reached the end</p>
-              </div>
-            )}
+            {pagination &&
+              page >= pagination.totalPages &&
+              videos.length > 0 && (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <p>You've reached the end</p>
+                </div>
+              )}
           </>
         ) : null}
 

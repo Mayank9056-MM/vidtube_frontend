@@ -115,7 +115,7 @@ const userSlice = createSlice({
         state.loading = false;
         logger.info("fetchCurrent user payload =>", action.payload.user);
 
-        state.user = action.payload.user;
+        state.user = action.payload;
         state.initialized = true;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
