@@ -11,6 +11,7 @@ import {
   refreshAccessToken,
 } from "./userThunks";
 import type { User } from "@/types/global";
+import { logger } from "@/utls/logger";
 
 interface UserState {
   user: User | null;
@@ -19,6 +20,7 @@ interface UserState {
   theme: "light" | "dark";
   tokenRefreshing: boolean;
   successMessage?: string | null;
+  initialized?: boolean;
 }
 
 const getInitialTheme = (): "light" | "dark" => {
@@ -37,6 +39,7 @@ const initialState: UserState = {
   theme: getInitialTheme(),
   tokenRefreshing: false,
   successMessage: null,
+  initialized: false,
 };
 
 const userSlice = createSlice({
@@ -64,6 +67,9 @@ const userSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    markInitialized: (state) => {
+      state.initialized = true;
+    },
   },
   extraReducers: (builder) => {
     // --- REGISTER ---
@@ -74,6 +80,7 @@ const userSlice = createSlice({
         state.successMessage = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
+        logger.info("register user payload =>", action.payload.user);
         state.loading = false;
         state.user = action.payload.user;
         state.successMessage = "User registered successfully";
@@ -90,8 +97,9 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        logger.info("login user payload =>", action.payload);
         state.loading = false;
-        state.user = action.payload.data.user;
+        state.user = action.payload;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -105,11 +113,19 @@ const userSlice = createSlice({
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.data;
+        logger.info("fetchCurrent user payload =>", action.payload.user);
+
+        state.user = action.payload.user;
+        state.initialized = true;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.user = null;
+        state.initialized = true;
+        state.error =
+          (action.payload as string) ||
+          action.error?.message ||
+          "Failed to fetch user";
       });
 
     // --- UPDATE ACCOUNT ---
@@ -179,5 +195,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { logout, toggleTheme, setTheme, clearError } = userSlice.actions;
+export const { logout, toggleTheme, setTheme, clearError, markInitialized } =
+  userSlice.actions;
 export default userSlice.reducer;

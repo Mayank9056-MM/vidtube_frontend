@@ -1,83 +1,214 @@
-import { useState } from "react";
-import { useAppSelector } from "@/app/hooks";
+import { useState, useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import type { RootState } from "@/app/store";
-import { Navbar } from "@/components/layout/Navbar";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Menu, Play, Clock, Eye } from "lucide-react";
+import { CheckCircle, MoreVertical, Loader2 } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import { VideoCard } from "@/components/layout/VideoCard";
 
-export default function Home() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const theme = useAppSelector((state: RootState) => state.user.theme);
-  const videos = useAppSelector((state: RootState) => state.video.videos)
+// Assuming you have this thunk in your video slice
+// import { fetchAllVideos } from "@/features/video/videoThunks";
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+export default function Home() {
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector((state: RootState) => state.user.theme);
+  const { videos, loading, error, pagination } = useAppSelector(
+    (state: RootState) => state.video
+  );
+
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { ref, inView } = useInView({
+    threshold: 0,
+  });
+
+  // Fetch videos on component mount and when filters change
+  useEffect(() => {
+    fetchVideos();
+  }, [page, selectedCategory, searchQuery]);
+
+  // Infinite scroll - load more when bottom is reached
+  useEffect(() => {
+    if (inView && !loading && pagination && page < pagination.totalPages) {
+      setPage((prev) => prev + 1);
+    }
+  }, [inView, loading, pagination]);
+
+  const fetchVideos = async () => {
+    const params = {
+      page,
+      limit: 12,
+      ...(searchQuery && { query: searchQuery }),
+      sortBy: "createdAt",
+      sortType: "desc",
+    };
+
+    // Dispatch your fetch action here
+    // await dispatch(fetchAllVideos(params));
+  };
+
+  const categories = [
+    "All",
+    "Gaming",
+    "Music",
+    "Tech",
+    "Cooking",
+    "Travel",
+    "Education",
+    "Fitness",
+    "Photography",
+    "Programming",
+    "Design",
+    "Business",
+  ];
+
+  // Helper function to format views
+  const formatViews = (views: number) => {
+    if (views >= 1000000) {
+      return `${(views / 1000000).toFixed(1)}M`;
+    } else if (views >= 1000) {
+      return `${(views / 1000).toFixed(1)}K`;
+    }
+    return views.toString();
+  };
+
+  // Helper function to format date
+  const formatDate = (date: string) => {
+    const now = new Date();
+    const videoDate = new Date(date);
+    const diffTime = Math.abs(now.getTime() - videoDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return `${Math.floor(diffDays / 365)} years ago`;
+  };
+
+  // Helper function to format duration
+  const formatDuration = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, "0")}:${secs
+        .toString()
+        .padStart(2, "0")}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
-    <div
-      className={`flex h-screen ${
-        theme === "dark"
-          ? "bg-gray-950 text-white"
-          : "bg-white text-gray-900"
-      }`}
-    >
-      {/* Sidebar */}
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-
-      {/* Main Area */}
-      <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Navbar */}
-        <Navbar />
-
-        {/* Mobile Menu Button */}
-        <div className="lg:hidden sticky top-[60px] z-40">
-          <button
-            onClick={toggleSidebar}
-            className={`m-4 p-2 rounded-lg ${
-              theme === "dark"
-                ? "bg-gray-800 hover:bg-gray-700"
-                : "bg-gray-100 hover:bg-gray-200"
-            } transition-colors`}
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+    <div className="w-full h-full overflow-y-auto bg-white dark:bg-black">
+      {/* Category Chips - Sticky */}
+      <div className="sticky top-0 z-40 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 px-4 sm:px-6 py-3">
+        <div className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => {
+                setSelectedCategory(category);
+                setPage(1);
+              }}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-full whitespace-nowrap text-xs sm:text-sm font-medium transition-all flex-shrink-0 ${
+                category === selectedCategory
+                  ? "bg-gray-900 dark:bg-white text-white dark:text-black"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-7xl mx-auto">
-            {/* Category Chips */}
-            <div className="flex gap-3 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-              {["All", "Gaming", "Music", "Tech", "Cooking", "Travel", "Education", "Fitness"].map(
-                (category) => (
-                  <button
-                    key={category}
-                    className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
-                      category === "All"
-                        ? theme === "dark"
-                          ? "bg-white text-black"
-                          : "bg-black text-white"
-                        : theme === "dark"
-                        ? "bg-gray-800 hover:bg-gray-700"
-                        : "bg-gray-100 hover:bg-gray-200"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                )
-              )}
-            </div>
+      {/* Video Grid */}
+      <div className="px-4 sm:px-6 py-4 sm:py-6">
+        {/* Loading State (First Load) */}
+        {loading && videos.length === 0 && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-red-600" />
+          </div>
+        )}
 
-            {/* Video Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {videos.map((video) => (
-                <VideoCard key={video.id} video={video} />
-              ))}
+        {/* Error State */}
+        {error && (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <p className="text-red-600 dark:text-red-400 mb-2">
+                Failed to load videos
+              </p>
+              <button
+                onClick={() => fetchVideos()}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Try Again
+              </button>
             </div>
           </div>
-        </main>
+        )}
+
+        {/* Videos Grid */}
+        {!loading || videos.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+              {videos.map((video: any) => (
+                <VideoCard
+                  key={video._id}
+                  video={{
+                    id: video._id,
+                    thumbnail: video.thumbnail?.url || video.thumbnail,
+                    title: video.title,
+                    channel: video.owner?.fullName || video.owner?.username || "Unknown",
+                    channelAvatar:
+                      video.owner?.avatar?.url ||
+                      video.owner?.avatar ||
+                      `https://ui-avatars.com/api/?name=${video.owner?.username}&background=ef4444&color=fff`,
+                    views: formatViews(video.views || 0),
+                    uploadedAt: formatDate(video.createdAt),
+                    duration: formatDuration(video.duration || 0),
+                    verified: video.owner?.isVerified || false,
+                  }}
+                  theme={theme}
+                />
+              ))}
+            </div>
+
+            {/* Infinite Scroll Trigger */}
+            {pagination && page < pagination.totalPages && (
+              <div ref={ref} className="flex justify-center py-8">
+                {loading && (
+                  <Loader2 className="w-6 h-6 animate-spin text-red-600" />
+                )}
+              </div>
+            )}
+
+            {/* End of Results */}
+            {pagination && page >= pagination.totalPages && videos.length > 0 && (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>You've reached the end</p>
+              </div>
+            )}
+          </>
+        ) : null}
+
+        {/* No Videos State */}
+        {!loading && videos.length === 0 && !error && (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                No videos found
+              </p>
+              <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">
+                Try adjusting your search or filters
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

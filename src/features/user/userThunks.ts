@@ -50,9 +50,12 @@ export const loginUser = createAsyncThunk<
       ? { email: data.emailOrUsername, password: data.password }
       : { username: data.emailOrUsername, password: data.password };
     const res = await loginUserApi(payload);
+    logger.info("resposne from login thunks => ",res)
     return res;
   } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || error.message || "Login Failed");
+    return rejectWithValue(
+      error.response?.data?.message || error.message || "Login Failed"
+    );
   }
 });
 
@@ -90,6 +93,7 @@ export const fetchCurrentUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await currentUserApi();
+      console.log(res);
       logger.info("current user from user thunks", res);
       return res;
     } catch (error: any) {
