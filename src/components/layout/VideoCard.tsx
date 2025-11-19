@@ -1,6 +1,7 @@
 import { useAppSelector } from "@/app/hooks";
 import type { RootState } from "@/app/store";
 import { Clock, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface VideoCardProps {
   video: {
@@ -17,9 +18,14 @@ interface VideoCardProps {
 
 export const VideoCard = ({ video }: VideoCardProps) => {
   const theme = useAppSelector((state: RootState) => state.user.theme);
+  const navigate = useNavigate();
 
   return (
-    <div className="group cursor-pointer">
+    <div
+      className="group cursor-pointer"
+      key={video.id}
+      onClick={() => navigate(`/watch/${video.id}`)}
+    >
       <div className="relative rounded-xl overflow-hidden mb-3">
         <img
           src={video.thumbnail}
