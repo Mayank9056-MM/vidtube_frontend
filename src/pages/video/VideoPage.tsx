@@ -21,7 +21,7 @@ import { useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import type { RootState } from "@/app/store";
 import { getVideoById } from "@/features/video/videoThunks";
-import { toggleSubscription } from "@/features/subscription/subscriptionThunks";
+import { getSubscribedChannels, toggleSubscription } from "@/features/subscription/subscriptionThunks";
 
 const recommendedVideos = [
   {
@@ -104,14 +104,15 @@ export default function VideoPage() {
 
   const channelId = videoData?.owner?._id;
 
-const subscribedChannels = useAppSelector(
-  (state: RootState) => state.subscription.subscribedChannels
-);
+  const subscribedChannels = useAppSelector(
+    (state: RootState) => state.subscription.subscribedChannels
+  );
 
-const reduxIsSubscribed = subscribedChannels?.some(
-  (ch) => ch._id === channelId
-);
+  const isSubscribed = useAppSelector(
+    (state: RootState) => state.subscription.isSubscribed
+  );
 
+  const user = useAppSelector((state: RootState) => state.user.user);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -119,9 +120,6 @@ const reduxIsSubscribed = subscribedChannels?.some(
   const [showControls, setShowControls] = useState(true);
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(
-    videoData?.channel?.isSubscribed || false
-  );
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState(mockComments);
@@ -138,12 +136,11 @@ const reduxIsSubscribed = subscribedChannels?.some(
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  useEffect(() => {
-  if (reduxIsSubscribed !== undefined) {
-    setIsSubscribed(reduxIsSubscribed);
-  }
-}, [reduxIsSubscribed]);
-
+  // useEffect(() => {
+  //   if (reduxIsSubscribed !== undefined) {
+  //     setIsSubscribed(reduxIsSubscribed);
+  //   }
+  // }, [reduxIsSubscribed]);
 
   useEffect(() => {
     const currVideo = async () => {
@@ -155,6 +152,14 @@ const reduxIsSubscribed = subscribedChannels?.some(
     };
     currVideo();
   }, [videoId]);
+
+//   useEffect(() => {
+//   if (channelId && subscribedChannels.length > 0) {
+//     const sub = subscribedChannels.some((ch) => ch._id === channelId);
+//     dispatch(setSubscriptionState(sub));  // You need this
+//   }
+// }, [channelId, subscribedChannels]);
+
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -207,11 +212,11 @@ const reduxIsSubscribed = subscribedChannels?.some(
   };
 
   const handleSubscribe = () => {
-  if (!videoData?.owner?._id) return;
-  dispatch(toggleSubscription(videoData.owner._id));
-};
+    if (!videoData?.owner?._id) return;
+    dispatch(toggleSubscription(videoData.owner._id));
+    dispatch(getSubscribedChannels(user?._id));
 
-  
+  };
 
   const handleComment = () => {
     if (comment.trim()) {
@@ -235,33 +240,33 @@ const reduxIsSubscribed = subscribedChannels?.some(
   };
 
   const formatDuration = (seconds) => {
-  if (!seconds) return "0:00";
+    if (!seconds) return "0:00";
 
-  const sec = Math.floor(seconds % 60);
-  const min = Math.floor((seconds / 60) % 60);
-  const hrs = Math.floor(seconds / 3600);
+    const sec = Math.floor(seconds % 60);
+    const min = Math.floor((seconds / 60) % 60);
+    const hrs = Math.floor(seconds / 3600);
 
-  const s = sec < 10 ? `0${sec}` : sec;
-  const m = min < 10 ? `0${min}` : min;
+    const s = sec < 10 ? `0${sec}` : sec;
+    const m = min < 10 ? `0${min}` : min;
 
-  if (hrs > 0) {
-    const h = hrs < 10 ? `0${hrs}` : hrs;
-    return `${h}:${m}:${s}`;
-  }
+    if (hrs > 0) {
+      const h = hrs < 10 ? `0${hrs}` : hrs;
+      return `${h}:${m}:${s}`;
+    }
 
-  return `${m}:${s}`;
-};
+    return `${m}:${s}`;
+  };
 
-const formatDate = (date) => {
-  if (!date) return "";
+  const formatDate = (date) => {
+    if (!date) return "";
 
-  const d = new Date(date);
-  return d.toLocaleDateString("en-IN", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
+    const d = new Date(date);
+    return d.toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   return (
     <div className={theme === "dark" ? "dark" : ""}>
@@ -365,7 +370,7 @@ const formatDate = (date) => {
                         {videoData?.owner?.username}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {videoData?.owner?.subscribers || 0} subscribers 
+                        {videoData?.owner?.subscribers || 0} subscribers
                         subscriber
                         {/* TODO: Add subscriber count */}
                       </p>
