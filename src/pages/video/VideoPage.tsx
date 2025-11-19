@@ -22,10 +22,12 @@ import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import type { RootState } from "@/app/store";
 import { getVideoById } from "@/features/video/videoThunks";
 import {
+  getChannelSubscribers,
   getSubscribedChannels,
   toggleSubscription,
 } from "@/features/subscription/subscriptionThunks";
 import { setSubscriptionState } from "@/features/subscription/susbcriptionSlice";
+import { logger } from "@/utls/logger";
 
 const recommendedVideos = [
   {
@@ -105,7 +107,7 @@ export default function VideoPage() {
   const videoData = useAppSelector(
     (state: RootState) => state.video.selectedVideo
   );
-
+  logger.info("videodata from videoPage", videoData);
   const channelId = videoData?.owner?._id;
 
   const subscribedChannels = useAppSelector(
@@ -114,6 +116,10 @@ export default function VideoPage() {
 
   const isSubscribed = useAppSelector(
     (state: RootState) => state.subscription.isSubscribed
+  );
+
+  const totalSubscribers = useAppSelector(
+    (state: RootState) => state.subscription.totalSubscribers
   );
 
   const user = useAppSelector((state: RootState) => state.user.user);
@@ -158,14 +164,18 @@ export default function VideoPage() {
   }, [user]);
 
   useEffect(() => {
-  if (channelId && subscribedChannels.length > 0) {
-    const alreadySubscribed = subscribedChannels.some(
-      (ch) => ch.channel?._id === channelId
-    );
-    dispatch(setSubscriptionState(alreadySubscribed));
-  }
-}, [channelId, subscribedChannels]);
+    if (channelId && subscribedChannels.length > 0) {
+      const alreadySubscribed = subscribedChannels.some(
+        (ch) => ch.channel?._id === channelId
+      );
+      dispatch(setSubscriptionState(alreadySubscribed));
+    }
+  }, [channelId, subscribedChannels]);
 
+  useEffect(() => {
+    if (!videoData?.owner?._id) return; // wait until owner id is loaded
+    dispatch(getChannelSubscribers(videoData.owner._id));
+  }, [videoData?.owner?._id, dispatch]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -375,9 +385,7 @@ export default function VideoPage() {
                         {videoData?.owner?.username}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {videoData?.owner?.subscribers || 0} subscribers
-                        subscriber
-                        {/* TODO: Add subscriber count */}
+                        {totalSubscribers || 0} subscribers subscriber
                       </p>
                     </div>
                     <button
