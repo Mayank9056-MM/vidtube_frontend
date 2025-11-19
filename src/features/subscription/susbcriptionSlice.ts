@@ -24,7 +24,11 @@ const initialState: SubscriptionState = {
 export const subscriptionSlice = createSlice({
   name: "subscription",
   initialState,
-  reducers: {},
+  reducers: {
+    setSubscriptionState: (state, action) => {
+      state.isSubscribed = action.payload;
+    },
+  },
 
   extraReducers: (builder) => {
     // Toggle Subscription
@@ -34,8 +38,7 @@ export const subscriptionSlice = createSlice({
     });
     builder.addCase(toggleSubscription.fulfilled, (state, action) => {
       state.loading = false;
-      state.isSubscribed =
-        action.payload?.data?.isSubscribed ?? state.isSubscribed;
+      state.isSubscribed = action.payload;
     });
     builder.addCase(toggleSubscription.rejected, (state, action) => {
       state.loading = false;
@@ -49,7 +52,7 @@ export const subscriptionSlice = createSlice({
     });
     builder.addCase(getSubscribedChannels.fulfilled, (state, action) => {
       state.loading = false;
-      state.subscribedChannels = action.payload.data || [];
+      state.subscribedChannels = action.payload || [];
     });
     builder.addCase(getSubscribedChannels.rejected, (state, action) => {
       state.loading = false;
@@ -63,7 +66,7 @@ export const subscriptionSlice = createSlice({
     });
     builder.addCase(getChannelSubscribers.fulfilled, (state, action) => {
       state.loading = false;
-      state.channelSubscribers = action.payload.data || [];
+      state.channelSubscribers = action.payload || [];
     });
     builder.addCase(getChannelSubscribers.rejected, (state, action) => {
       state.loading = false;
@@ -71,5 +74,7 @@ export const subscriptionSlice = createSlice({
     });
   },
 });
+export const { setSubscriptionState } = subscriptionSlice.actions;
+
 
 export default subscriptionSlice.reducer;
