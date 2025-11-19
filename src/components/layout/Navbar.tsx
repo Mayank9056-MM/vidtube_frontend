@@ -2,20 +2,37 @@ import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/app/store";
 import { toggleSidebar } from "@/features/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
-import {
-  Menu,
-  Search,
-  Mic,
-  Bell,
-  Plus,
-  X,
-} from "lucide-react";
-import { useState } from "react";
+import { Menu, Search, Mic, Bell, Plus, X, Settings, LogOut, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    // Add your logout logic here
+    // Example: dispatch(logout()); or clear tokens
+    console.log("Logging out...");
+    navigate("/login");
+  };
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between px-2 sm:px-4 py-2 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm">
@@ -29,7 +46,7 @@ export const Navbar = () => {
           <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300" />
         </button>
 
-        <div 
+        <div
           className="flex items-center gap-1 sm:gap-2 cursor-pointer flex-shrink-0"
           onClick={() => navigate("/home")}
         >
@@ -46,7 +63,14 @@ export const Navbar = () => {
                 <stop offset="1" stopColor="#c0122a" />
               </linearGradient>
             </defs>
-            <rect x="24" y="24" width="464" height="464" rx="88" fill="url(#nav-grad)" />
+            <rect
+              x="24"
+              y="24"
+              width="464"
+              height="464"
+              rx="88"
+              fill="url(#nav-grad)"
+            />
             <g transform="translate(140,124) scale(0.9)">
               <path
                 d="M86 36.5C92.1 40 96 46.9 96 54.7V213.3C96 221.1 92.1 228 86 231.5C78.9 235 69.7 232.6 63.9 226.8L13.8 176.7C8.0 170.9 8.0 160.1 13.8 154.3L63.9 104.2C69.7 98.4 78.9 96 86 99.5Z"
@@ -88,40 +112,87 @@ export const Navbar = () => {
       {/* Right - Actions */}
       <div className="flex items-center gap-1 sm:gap-2">
         {/* Mobile Search Toggle */}
-        <button 
+        <button
           className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
           onClick={() => setIsSearchOpen(!isSearchOpen)}
         >
           <Search className="w-5 h-5 text-gray-700 dark:text-gray-300" />
         </button>
 
-        <button 
+        <button
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors hidden sm:block"
           onClick={() => navigate("/upload")}
         >
           <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300" />
         </button>
-        
+
         <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors relative">
           <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full"></span>
         </button>
-        
-        <button 
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-          onClick={() => navigate("/profile")}
-        >
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-semibold">
+
+        {/* Avatar with Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold hover:shadow-lg transition-all duration-200 hover:scale-105"
+          >
             A
-          </div>
-        </button>
+          </button>
+
+          {/* Dropdown Menu */}
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+              {/* User Info Header */}
+              <div className="px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500">
+                <p className="text-white font-semibold text-sm">User Name</p>
+                <p className="text-white/80 text-xs">user@example.com</p>
+              </div>
+
+              {/* Menu Items */}
+              <div className="py-1">
+                <button
+                  onClick={() => {
+                    navigate("/profile");
+                    setIsDropdownOpen(false);
+                  }}
+                  className="w-full px-4 py-2.5 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-3"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Your Profile</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    navigate("/settings");
+                    setIsDropdownOpen(false);
+                  }}
+                  className="w-full px-4 py-2.5 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-3"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Settings</span>
+                </button>
+
+                <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-4 py-2.5 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-3"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Mobile Search Overlay */}
       {isSearchOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 p-4 shadow-lg">
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={() => setIsSearchOpen(false)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
             >
