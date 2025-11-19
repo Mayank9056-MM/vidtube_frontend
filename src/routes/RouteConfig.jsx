@@ -2,6 +2,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Home from "@/pages/Home";
 import UploadPage from "@/pages/Upload";
+import VideoPage from "../pages/video/VideoPage";
 
 export const publicRoutes = [
   {
@@ -23,4 +24,8 @@ export const privateRoutes = [
     path: "/upload",
     element: <UploadPage />,
   },
+  {
+    path: "/watch/:videoId",
+    element: <VideoPage />,
+  }
 ];
