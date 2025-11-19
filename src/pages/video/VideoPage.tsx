@@ -28,6 +28,9 @@ import {
 } from "@/features/subscription/subscriptionThunks";
 import { setSubscriptionState } from "@/features/subscription/susbcriptionSlice";
 import { logger } from "@/utls/logger";
+import { getAllLikedVideos, toggleVideoLike } from "@/features/like/likeThunks";
+import { setInitialLikeState } from "@/features/like/likeSlice";
+
 
 const recommendedVideos = [
   {
@@ -104,10 +107,21 @@ export default function VideoPage() {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const { videoId } = useParams();
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const [disliked, setDisliked] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [comment, setComment] = useState("");
+  const [comments, setComments] = useState(mockComments);
+  const [theme] = useState("light");
+  const dispatch = useAppDispatch();
+
   const videoData = useAppSelector(
     (state: RootState) => state.video.selectedVideo
   );
-  logger.info("videodata from videoPage", videoData);
   const channelId = videoData?.owner?._id;
 
   const subscribedChannels = useAppSelector(
@@ -123,18 +137,9 @@ export default function VideoPage() {
   );
 
   const user = useAppSelector((state: RootState) => state.user.user);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [liked, setLiked] = useState(false);
-  const [disliked, setDisliked] = useState(false);
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const [comment, setComment] = useState("");
-  const [comments, setComments] = useState(mockComments);
-  const [theme] = useState("light");
-  const dispatch = useAppDispatch();
+  const { isLiked, likesCount,likedVideos } = useAppSelector(
+    (state: RootState) => state.like
+  );
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -177,6 +182,22 @@ export default function VideoPage() {
     dispatch(getChannelSubscribers(videoData.owner._id));
   }, [videoData?.owner?._id, dispatch]);
 
+  useEffect(() => {
+    if (!videoData?.owner?._id) return; // wait until owner id is loaded
+    dispatch(getAllLikedVideos());
+  },[videoData?.owner?._id,dispatch])
+
+  useEffect(() => {
+    console.log(videoData?.isLiked, videoData?.likeCount,videoData,"videoData");
+  if (videoData) {
+    dispatch(setInitialLikeState({
+      isLiked: !!videoData.isLiked,
+      likesCount: videoData.likeCount
+    }));
+  }
+}, [videoData]);
+
+
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -209,12 +230,12 @@ export default function VideoPage() {
     }
   };
 
-  const handleLike = () => {
-    if (liked) {
-      setLiked(false);
+  const handleLike = async () => {
+    if (isLiked) {
+      await dispatch(toggleVideoLike(videoData._id));
     } else {
-      setLiked(true);
       setDisliked(false);
+      await dispatch(toggleVideoLike(videoData._id));
     }
   };
 
@@ -223,7 +244,6 @@ export default function VideoPage() {
       setDisliked(false);
     } else {
       setDisliked(true);
-      setLiked(false);
     }
   };
 
@@ -406,15 +426,14 @@ export default function VideoPage() {
                       <button
                         onClick={handleLike}
                         className={`flex items-center gap-2 px-4 py-2 transition-colors ${
-                          liked
+                          isLiked
                             ? "text-red-600 dark:text-red-400"
                             : "text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400"
                         }`}
                       >
                         <ThumbsUp className="w-5 h-5" />
                         <span className="font-medium">
-                          {formatNumber(videoData?.likes)}
-                          {/* TODO: Add like */}
+                          {formatNumber(likesCount)}
                         </span>
                       </button>
                       <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />

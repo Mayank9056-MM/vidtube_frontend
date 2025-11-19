@@ -7,8 +7,9 @@ import {
 } from "./likeThunks";
 
 interface LikeState {
-  likedVideos: string[]; 
-  videoLiked: boolean | null;
+  likedVideos: string[];
+  isLiked: boolean | null;
+  likesCount: number;
   commentLiked: boolean | null;
   tweetLiked: boolean | null;
   loading: boolean;
@@ -17,7 +18,8 @@ interface LikeState {
 
 const initialState: LikeState = {
   likedVideos: [],
-  videoLiked: null,
+  isLiked: null,
+  likesCount: 0,
   commentLiked: null,
   tweetLiked: null,
   loading: false,
@@ -27,7 +29,12 @@ const initialState: LikeState = {
 const likeSlice = createSlice({
   name: "likes",
   initialState,
-  reducers: {},
+  reducers: {
+     setInitialLikeState: (state, action) => {
+    state.isLiked = action.payload.isLiked;
+    state.likesCount = action.payload.likesCount;
+  }
+  },
 
   extraReducers: (builder) => {
     builder
@@ -37,7 +44,8 @@ const likeSlice = createSlice({
       })
       .addCase(toggleVideoLike.fulfilled, (state, action) => {
         state.loading = false;
-        state.videoLiked = action.payload;
+        state.isLiked = action.payload.isLiked;
+        state.likesCount = action.payload.totalLikes;
       })
       .addCase(toggleVideoLike.rejected, (state, action) => {
         state.loading = false;
@@ -84,5 +92,8 @@ const likeSlice = createSlice({
       });
   },
 });
+
+export const { setInitialLikeState } = likeSlice.actions;
+
 
 export default likeSlice.reducer;
