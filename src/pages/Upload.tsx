@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppSelector } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import type { RootState } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { publishVideo } from "@/features/video/videoThunks";
 
 export interface PublishVideoData {
   video: File;
@@ -40,6 +41,7 @@ export default function UploadPage() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const theme = useAppSelector((state: RootState) => state.user.theme);
+  const dispatch = useAppDispatch();
 
   const {
     register,
@@ -82,7 +84,9 @@ export default function UploadPage() {
     if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
   };
 
-  const onSubmit = async (data: Omit<PublishVideoData, "video" | "thumbnail">) => {
+  const onSubmit = async (
+    data: Omit<PublishVideoData, "video" | "thumbnail">
+  ) => {
     if (!videoFile || !thumbnailFile) {
       return;
     }
@@ -115,14 +119,14 @@ export default function UploadPage() {
       }, 2000);
     }, 3000);
 
-    // Your actual API call would go here
-    // const formData: PublishVideoData = {
-    //   video: videoFile,
-    //   thumbnail: thumbnailFile,
-    //   title: data.title,
-    //   description: data.description,
-    // };
-    // await dispatch(publishVideo(formData));
+   
+    const formData: PublishVideoData = {
+      video: videoFile,
+      thumbnail: thumbnailFile,
+      title: data.title,
+      description: data.description,
+    };
+    await dispatch(publishVideo(formData));
   };
 
   return (
@@ -141,7 +145,8 @@ export default function UploadPage() {
             </div>
           </div>
           <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto lg:mx-0">
-            Share your creativity with the world. Upload your video and reach millions of viewers.
+            Share your creativity with the world. Upload your video and reach
+            millions of viewers.
           </p>
         </div>
 
@@ -283,7 +288,10 @@ export default function UploadPage() {
               </CardHeader>
               <CardContent className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="title"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                  >
                     Title *
                   </Label>
                   <Input
@@ -319,7 +327,10 @@ export default function UploadPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="description"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                  >
                     Description *
                   </Label>
                   <Textarea
@@ -338,7 +349,9 @@ export default function UploadPage() {
                       },
                     })}
                     className={`bg-gray-50 dark:bg-gray-950 border-gray-300 dark:border-gray-700 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500 transition-all resize-none ${
-                      errors.description ? "border-red-500 dark:border-red-500" : ""
+                      errors.description
+                        ? "border-red-500 dark:border-red-500"
+                        : ""
                     }`}
                   />
                   <div className="flex items-center justify-between text-xs">
@@ -359,8 +372,12 @@ export default function UploadPage() {
                 {isUploading && (
                   <div className="space-y-3 p-4 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200 dark:border-blue-800">
                     <div className="flex justify-between items-center text-sm font-medium">
-                      <span className="text-blue-700 dark:text-blue-300">Uploading your video...</span>
-                      <span className="text-blue-600 dark:text-blue-400">{uploadProgress}%</span>
+                      <span className="text-blue-700 dark:text-blue-300">
+                        Uploading your video...
+                      </span>
+                      <span className="text-blue-600 dark:text-blue-400">
+                        {uploadProgress}%
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
                       <div
@@ -383,7 +400,8 @@ export default function UploadPage() {
                           Upload successful!
                         </p>
                         <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                          Your video is being processed and will be live shortly.
+                          Your video is being processed and will be live
+                          shortly.
                         </p>
                       </div>
                     </div>
