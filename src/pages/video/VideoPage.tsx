@@ -17,27 +17,10 @@ import {
   ChevronUp,
   Send,
 } from "lucide-react";
-
-// Mock data - replace with actual API calls
-const videoData = {
-  id: 1,
-  title: "Complete React Tutorial 2024 - Build Modern Web Applications",
-  description:
-    "Learn React from scratch in this comprehensive tutorial. We'll cover everything from the basics to advanced concepts including hooks, context, routing, and state management. Perfect for beginners and intermediate developers looking to master React.\n\nTimestamps:\n0:00 Introduction\n2:30 Setting up environment\n10:15 Components & Props\n25:40 State & Hooks\n45:00 Advanced patterns\n\n🔗 Resources:\n- GitHub: github.com/example\n- Documentation: reactjs.org\n\n#React #WebDevelopment #Programming",
-  videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-  channel: {
-    name: "Tech Academy",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=TechAcademy",
-    subscribers: "1.2M",
-    isSubscribed: false,
-  },
-  views: "156K",
-  uploadDate: "2 days ago",
-  likes: 12500,
-  dislikes: 145,
-  duration: "1:24:35",
-  category: "Education",
-};
+import { useParams } from "react-router-dom";
+import { useAppSelector, useAppDispatch } from "@/app/hooks";
+import type { RootState } from "@/app/store";
+import { getVideoById } from "@/features/video/videoThunks";
 
 const recommendedVideos = [
   {
@@ -87,7 +70,8 @@ const mockComments = [
     id: 1,
     user: "John Developer",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-    comment: "This is exactly what I needed! The explanations are crystal clear.",
+    comment:
+      "This is exactly what I needed! The explanations are crystal clear.",
     likes: 245,
     time: "2 days ago",
   },
@@ -112,6 +96,10 @@ const mockComments = [
 export default function VideoPage() {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
+  const { videoId } = useParams();
+  const videoData = useAppSelector(
+    (state: RootState) => state.video.selectedVideo
+  );
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -119,11 +107,14 @@ export default function VideoPage() {
   const [showControls, setShowControls] = useState(true);
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(videoData.channel.isSubscribed);
+  const [isSubscribed, setIsSubscribed] = useState(
+    videoData?.channel?.isSubscribed || false
+  );
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState(mockComments);
   const [theme] = useState("light");
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -131,8 +122,20 @@ export default function VideoPage() {
     };
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
+
+  useEffect(() => {
+    const currVideo = async () => {
+      try {
+        await dispatch(getVideoById(videoId));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    currVideo();
+  }, [videoId]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -206,8 +209,37 @@ export default function VideoPage() {
   const formatNumber = (num) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
     if (num >= 1000) return (num / 1000).toFixed(1) + "K";
-    return num.toString();
+    return num?.toString();
   };
+
+  const formatDuration = (seconds) => {
+  if (!seconds) return "0:00";
+
+  const sec = Math.floor(seconds % 60);
+  const min = Math.floor((seconds / 60) % 60);
+  const hrs = Math.floor(seconds / 3600);
+
+  const s = sec < 10 ? `0${sec}` : sec;
+  const m = min < 10 ? `0${min}` : min;
+
+  if (hrs > 0) {
+    const h = hrs < 10 ? `0${hrs}` : hrs;
+    return `${h}:${m}:${s}`;
+  }
+
+  return `${m}:${s}`;
+};
+
+const formatDate = (date) => {
+  if (!date) return "";
+
+  const d = new Date(date);
+  return d.toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
 
   return (
     <div className={theme === "dark" ? "dark" : ""}>
@@ -226,7 +258,7 @@ export default function VideoPage() {
                 <video
                   ref={videoRef}
                   className="w-full aspect-video"
-                  src={videoData.videoUrl}
+                  src={videoData?.videoFile}
                   onClick={togglePlay}
                 />
 
@@ -257,16 +289,24 @@ export default function VideoPage() {
                         onClick={togglePlay}
                         className="text-white hover:text-red-400 transition-colors"
                       >
-                        {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                        {isPlaying ? (
+                          <Pause className="w-6 h-6" />
+                        ) : (
+                          <Play className="w-6 h-6" />
+                        )}
                       </button>
                       <button
                         onClick={toggleMute}
                         className="text-white hover:text-red-400 transition-colors"
                       >
-                        {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+                        {isMuted ? (
+                          <VolumeX className="w-6 h-6" />
+                        ) : (
+                          <Volume2 className="w-6 h-6" />
+                        )}
                       </button>
                       <span className="text-white text-sm font-medium">
-                        {videoData.duration}
+                        {formatDuration(videoData?.duration)}
                       </span>
                     </div>
 
@@ -287,23 +327,25 @@ export default function VideoPage() {
               {/* Video Info */}
               <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-xl p-4 lg:p-6 shadow-lg border border-gray-200 dark:border-gray-800">
                 <h1 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                  {videoData.title}
+                  {videoData?.title}
                 </h1>
 
                 {/* Channel Info & Actions */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                   <div className="flex items-center gap-4">
                     <img
-                      src={videoData.channel.avatar}
-                      alt={videoData.channel.name}
+                      src={videoData?.owner?.avatar}
+                      alt={videoData?.owner?.username}
                       className="w-12 h-12 rounded-full border-2 border-red-500 dark:border-red-400"
                     />
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {videoData.channel.name}
+                        {videoData?.owner?.username}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {videoData.channel.subscribers} subscribers
+                        {videoData?.owner?.subscribers || 0} subscribers 
+                        subscriber
+                        {/* TODO: Add subscriber count */}
                       </p>
                     </div>
                     <button
@@ -330,7 +372,10 @@ export default function VideoPage() {
                         }`}
                       >
                         <ThumbsUp className="w-5 h-5" />
-                        <span className="font-medium">{formatNumber(videoData.likes)}</span>
+                        <span className="font-medium">
+                          {formatNumber(videoData?.likes)}
+                          {/* TODO: Add like */}
+                        </span>
                       </button>
                       <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />
                       <button
@@ -348,7 +393,9 @@ export default function VideoPage() {
                     {/* Share */}
                     <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-700 dark:text-gray-300">
                       <Share2 className="w-5 h-5" />
-                      <span className="hidden sm:inline font-medium">Share</span>
+                      <span className="hidden sm:inline font-medium">
+                        Share
+                      </span>
                     </button>
 
                     {/* Download */}
@@ -368,15 +415,15 @@ export default function VideoPage() {
                   <div className="flex items-center gap-4 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     <span className="flex items-center gap-1">
                       <Eye className="w-4 h-4" />
-                      {videoData.views} views
+                      {videoData?.views} views
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
-                      {videoData.uploadDate}
+                      {formatDate(videoData?.createdAt)}
                     </span>
                     <span className="px-3 py-1 bg-red-100 dark:bg-red-950/30 text-red-600 dark:text-red-400 rounded-full text-xs">
-                      {videoData.category}
+                      {videoData?.category}
                     </span>
                   </div>
 
@@ -386,10 +433,12 @@ export default function VideoPage() {
                         showFullDescription ? "" : "line-clamp-3"
                       }`}
                     >
-                      {videoData.description}
+                      {videoData?.description}
                     </p>
                     <button
-                      onClick={() => setShowFullDescription(!showFullDescription)}
+                      onClick={() =>
+                        setShowFullDescription(!showFullDescription)
+                      }
                       className="flex items-center gap-1 mt-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
                     >
                       {showFullDescription ? (
@@ -466,7 +515,9 @@ export default function VideoPage() {
                             {c.time}
                           </span>
                         </div>
-                        <p className="text-gray-700 dark:text-gray-300 mb-2">{c.comment}</p>
+                        <p className="text-gray-700 dark:text-gray-300 mb-2">
+                          {c.comment}
+                        </p>
                         <div className="flex items-center gap-4">
                           <button className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             <ThumbsUp className="w-4 h-4" />
