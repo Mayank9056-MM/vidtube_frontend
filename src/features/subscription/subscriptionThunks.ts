@@ -3,6 +3,7 @@ import {
   getSubscribedChannelsApi,
   toggleSubscriptionApi,
 } from "@/api/susbscriptionApi";
+import { logger } from "@/utls/logger";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // Toggle subscription (subscribe/unsubscribe)
@@ -11,6 +12,7 @@ export const toggleSubscription = createAsyncThunk(
   async (channelId: string, { rejectWithValue }) => {
     try {
       const res = await toggleSubscriptionApi(channelId);
+      logger.info("toggle subs from thunks",res)
       return res;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || error.message);
