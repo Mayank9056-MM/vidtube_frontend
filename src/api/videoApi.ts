@@ -21,10 +21,11 @@ export const publishVideoApi = async (data: publishVideoData) => {
 // get video by id
 export const getVideoByIdApi = async (videoId: string) => {
   try {
+    logger.info(videoId,"video Id from get video by id")
     const res = await axiosInstance.get(`/api/v1/videos/get-video/${videoId}`);
 
     logger.info("res from get video by id api => ", res);
-    return res.data;
+    return res.data.data;
   } catch (error: any) {
     logger.warn("error in get video by id api", error);
     return error.message;
@@ -84,7 +85,7 @@ export const togglePublishStatusApi = async (videoId: string) => {
   }
 };
 
-// delete video by id
+// get all videos
 export const getAllVideosApi = async () => {
   try {
     const res = await axiosInstance.get(`/api/v1/videos/all-videos`);
