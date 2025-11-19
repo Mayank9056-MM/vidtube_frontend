@@ -1,16 +1,21 @@
-import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/app/store";
 import { toggleSidebar } from "@/features/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
 import { Menu, Search, Mic, Bell, Plus, X, Settings, LogOut, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { logout } from "@/features/user/userSlice";
+import { useToast } from "@/hooks/useToast";
 
 export const Navbar = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+    const { showError, showSuccess } = useToast();
+
+  const user = useAppSelector((state: RootState) => state.user.user);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -27,11 +32,13 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
     // Add your logout logic here
     // Example: dispatch(logout()); or clear tokens
+    await dispatch(logout())
     console.log("Logging out...");
-    navigate("/login");
+    showSuccess("Logout successful 🎉");
+    // navigate("/login");
   };
 
   return (
@@ -137,7 +144,7 @@ export const Navbar = () => {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold hover:shadow-lg transition-all duration-200 hover:scale-105"
           >
-            A
+            {user?.username?.charAt(0) || "A"}
           </button>
 
           {/* Dropdown Menu */}
@@ -145,8 +152,8 @@ export const Navbar = () => {
             <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
               {/* User Info Header */}
               <div className="px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500">
-                <p className="text-white font-semibold text-sm">User Name</p>
-                <p className="text-white/80 text-xs">user@example.com</p>
+                <p className="text-white font-semibold text-sm">{user?.username || "Username"}</p>
+                <p className="text-white/80 text-xs">{user?.email || "Email"}</p>
               </div>
 
               {/* Menu Items */}
