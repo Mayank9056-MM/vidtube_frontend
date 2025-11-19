@@ -8,6 +8,7 @@ import {
 export interface SubscriptionState {
   subscribedChannels: any[];
   channelSubscribers: any[];
+  totalSubscribers: number;
   isSubscribed: boolean;
   loading: boolean;
   error: string | null;
@@ -17,6 +18,7 @@ const initialState: SubscriptionState = {
   subscribedChannels: [],
   channelSubscribers: [],
   isSubscribed: false,
+  totalSubscribers: 0,
   loading: false,
   error: null,
 };
@@ -38,11 +40,12 @@ export const subscriptionSlice = createSlice({
     });
     builder.addCase(toggleSubscription.fulfilled, (state, action) => {
       state.loading = false;
-      state.isSubscribed = action.payload;
+      state.isSubscribed = action.payload.data.isSubscribed;
+      state.totalSubscribers = action.payload.data.totalSubscribers;
     });
     builder.addCase(toggleSubscription.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload as string;
+      state.error = action.payload.message as string;
     });
 
     // Get Subscribed Channels
@@ -67,6 +70,7 @@ export const subscriptionSlice = createSlice({
     builder.addCase(getChannelSubscribers.fulfilled, (state, action) => {
       state.loading = false;
       state.channelSubscribers = action.payload || [];
+       state.totalSubscribers = action.payload.length;
     });
     builder.addCase(getChannelSubscribers.rejected, (state, action) => {
       state.loading = false;
@@ -75,6 +79,5 @@ export const subscriptionSlice = createSlice({
   },
 });
 export const { setSubscriptionState } = subscriptionSlice.actions;
-
 
 export default subscriptionSlice.reducer;

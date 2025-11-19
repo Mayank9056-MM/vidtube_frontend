@@ -6,7 +6,7 @@ export const toggleSubscriptionApi = async (channelId: string) => {
     const res = await axiosInstance.patch(
       `/api/v1/subscriptions/toggle-sub/${channelId}`
     );
-    return res.data.data;
+    return res.data;
   } catch (error) {
     console.log(error);
     throw error;
