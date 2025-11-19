@@ -385,7 +385,7 @@ export default function VideoPage() {
                         {videoData?.owner?.username}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {totalSubscribers || 0} subscribers subscriber
+                        {totalSubscribers || 0} subscribers
                       </p>
                     </div>
                     <button
