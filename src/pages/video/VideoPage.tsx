@@ -21,7 +21,11 @@ import { useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import type { RootState } from "@/app/store";
 import { getVideoById } from "@/features/video/videoThunks";
-import { getSubscribedChannels, toggleSubscription } from "@/features/subscription/subscriptionThunks";
+import {
+  getSubscribedChannels,
+  toggleSubscription,
+} from "@/features/subscription/subscriptionThunks";
+import { setSubscriptionState } from "@/features/subscription/susbcriptionSlice";
 
 const recommendedVideos = [
   {
@@ -136,12 +140,6 @@ export default function VideoPage() {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  // useEffect(() => {
-  //   if (reduxIsSubscribed !== undefined) {
-  //     setIsSubscribed(reduxIsSubscribed);
-  //   }
-  // }, [reduxIsSubscribed]);
-
   useEffect(() => {
     const currVideo = async () => {
       try {
@@ -153,12 +151,20 @@ export default function VideoPage() {
     currVideo();
   }, [videoId]);
 
-//   useEffect(() => {
-//   if (channelId && subscribedChannels.length > 0) {
-//     const sub = subscribedChannels.some((ch) => ch._id === channelId);
-//     dispatch(setSubscriptionState(sub));  // You need this
-//   }
-// }, [channelId, subscribedChannels]);
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(getSubscribedChannels(user._id));
+    }
+  }, [user]);
+
+  useEffect(() => {
+  if (channelId && subscribedChannels.length > 0) {
+    const alreadySubscribed = subscribedChannels.some(
+      (ch) => ch.channel?._id === channelId
+    );
+    dispatch(setSubscriptionState(alreadySubscribed));
+  }
+}, [channelId, subscribedChannels]);
 
 
   const togglePlay = () => {
@@ -215,7 +221,6 @@ export default function VideoPage() {
     if (!videoData?.owner?._id) return;
     dispatch(toggleSubscription(videoData.owner._id));
     dispatch(getSubscribedChannels(user?._id));
-
   };
 
   const handleComment = () => {

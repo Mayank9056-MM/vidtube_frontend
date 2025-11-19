@@ -24,7 +24,11 @@ const initialState: SubscriptionState = {
 export const subscriptionSlice = createSlice({
   name: "subscription",
   initialState,
-  reducers: {},
+  reducers: {
+    setSubscriptionState: (state, action) => {
+      state.isSubscribed = action.payload;
+    },
+  },
 
   extraReducers: (builder) => {
     // Toggle Subscription
@@ -70,5 +74,7 @@ export const subscriptionSlice = createSlice({
     });
   },
 });
+export const { setSubscriptionState } = subscriptionSlice.actions;
+
 
 export default subscriptionSlice.reducer;
