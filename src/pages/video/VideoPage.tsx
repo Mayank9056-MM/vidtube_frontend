@@ -21,6 +21,7 @@ import { useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import type { RootState } from "@/app/store";
 import { getVideoById } from "@/features/video/videoThunks";
+import { toggleSubscription } from "@/features/subscription/subscriptionThunks";
 
 const recommendedVideos = [
   {
@@ -101,6 +102,17 @@ export default function VideoPage() {
     (state: RootState) => state.video.selectedVideo
   );
 
+  const channelId = videoData?.owner?._id;
+
+const subscribedChannels = useAppSelector(
+  (state: RootState) => state.subscription.subscribedChannels
+);
+
+const reduxIsSubscribed = subscribedChannels?.some(
+  (ch) => ch._id === channelId
+);
+
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -125,6 +137,13 @@ export default function VideoPage() {
     return () =>
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
+
+  useEffect(() => {
+  if (reduxIsSubscribed !== undefined) {
+    setIsSubscribed(reduxIsSubscribed);
+  }
+}, [reduxIsSubscribed]);
+
 
   useEffect(() => {
     const currVideo = async () => {
@@ -188,8 +207,11 @@ export default function VideoPage() {
   };
 
   const handleSubscribe = () => {
-    setIsSubscribed(!isSubscribed);
-  };
+  if (!videoData?.owner?._id) return;
+  dispatch(toggleSubscription(videoData.owner._id));
+};
+
+  
 
   const handleComment = () => {
     if (comment.trim()) {
