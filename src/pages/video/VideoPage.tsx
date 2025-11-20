@@ -30,7 +30,11 @@ import { setSubscriptionState } from "@/features/subscription/susbcriptionSlice"
 import { logger } from "@/utls/logger";
 import { getAllLikedVideos, toggleVideoLike } from "@/features/like/likeThunks";
 import { setInitialLikeState } from "@/features/like/likeSlice";
-import { createComment, getComments } from "@/features/comment/commentThunks";
+import {
+  createComment,
+  getComments,
+  toggleCommentLike,
+} from "@/features/comment/commentThunks";
 import { useToast } from "@/hooks/useToast";
 
 const recommendedVideos = [
@@ -76,34 +80,6 @@ const recommendedVideos = [
   },
 ];
 
-const mockComments = [
-  {
-    id: 1,
-    user: "John Developer",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-    comment:
-      "This is exactly what I needed! The explanations are crystal clear.",
-    likes: 245,
-    time: "2 days ago",
-  },
-  {
-    id: 2,
-    user: "Sarah Chen",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-    comment: "Best React tutorial I've watched. Thanks for making this!",
-    likes: 189,
-    time: "1 day ago",
-  },
-  {
-    id: 3,
-    user: "Mike Rodriguez",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
-    comment: "The timestamps are super helpful. Great content as always! 🔥",
-    likes: 156,
-    time: "18 hours ago",
-  },
-];
-
 export default function VideoPage() {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -143,6 +119,10 @@ export default function VideoPage() {
   );
 
   const comments = useAppSelector((state: RootState) => state.comment.comments);
+  console.log("comments from state video Page => ", comments);
+  const { isCommentLiked, commentLikes } = useAppSelector(
+    (state: RootState) => state.comment
+  );
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -242,6 +222,11 @@ export default function VideoPage() {
     } catch (err) {
       console.error("Fullscreen error:", err);
     }
+  };
+
+  const handleCommentLike = async (commentId: string) => {
+    await dispatch(toggleCommentLike(commentId));
+    await dispatch(getComments(videoId));
   };
 
   const handleLike = async () => {
@@ -587,10 +572,12 @@ export default function VideoPage() {
                           {c?.content}
                         </p>
                         <div className="flex items-center gap-4">
-                          <button className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                          <button
+                            className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                            onClick={() => handleCommentLike(c?._id)}
+                          >
                             <ThumbsUp className="w-4 h-4" />
-                            <span>{c.likes}</span>
-                            {/* TODO: get comment like */}
+                            <span>{c?.totalLikes}</span>
                           </button>
                           <button className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             <ThumbsDown className="w-4 h-4" />

@@ -1,6 +1,25 @@
-import { createCommentApi, deleteCommentApi, getCommentsApi, updateCommentApi } from "@/api/comment/commentApi";
+import {
+  createCommentApi,
+  deleteCommentApi,
+  getCommentsApi,
+  updateCommentApi,
+} from "@/api/comment/commentApi";
+import { toggleCommentLikeApi } from "@/api/like/likeApi";
+import { logger } from "@/utls/logger";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+export const toggleCommentLike = createAsyncThunk(
+  "comments/toggleCommentLike",
+  async (commentId: string, { rejectWithValue }) => {
+    try {
+      const res = await toggleCommentLikeApi(commentId);
+      logger.info("toggle comment like res => ", res);
+      return res;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to like comment");
+    }
+  }
+);
 
 // CREATE COMMENT
 export const createComment = createAsyncThunk(
@@ -13,7 +32,9 @@ export const createComment = createAsyncThunk(
       const data = await createCommentApi({ content, videoId });
       return data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Failed to create comment");
+      return rejectWithValue(
+        error.response?.data || "Failed to create comment"
+      );
     }
   }
 );
@@ -29,7 +50,9 @@ export const updateComment = createAsyncThunk(
       const data = await updateCommentApi({ commentId, content });
       return data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Failed to update comment");
+      return rejectWithValue(
+        error.response?.data || "Failed to update comment"
+      );
     }
   }
 );
@@ -42,7 +65,9 @@ export const deleteComment = createAsyncThunk(
       const data = await deleteCommentApi(commentId);
       return data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Failed to delete comment");
+      return rejectWithValue(
+        error.response?.data || "Failed to delete comment"
+      );
     }
   }
 );

@@ -4,6 +4,7 @@ import {
   updateComment,
   deleteComment,
   getComments,
+  toggleCommentLike,
 } from "./commentThunks";
 
 export interface Comment {
@@ -12,6 +13,8 @@ export interface Comment {
     username: string;
   };
   _id: string;
+  isCommentLiked: boolean;
+  totalLikes: number;
   content: string;
   userId: string;
   videoId: string;
@@ -38,6 +41,17 @@ export const commentSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+
+      .addCase(toggleCommentLike.fulfilled, (state, action) => {
+        const { commentId, isCommentLiked, totalLikes } = action.payload;
+
+        const comment = state.comments.find((c) => c._id === commentId);
+        if (comment) {
+          comment.isCommentLiked = isCommentLiked;
+          comment.totalLikes = totalLikes;
+        }
+      })
+
       // GET COMMENTS
       .addCase(getComments.pending, (state) => {
         state.loading = true;
@@ -68,9 +82,7 @@ export const commentSlice = createSlice({
       })
 
       // DELETE COMMENT
-      .addCase(deleteComment.fulfilled, (state, action) => {
-        
-      });
+      .addCase(deleteComment.fulfilled, (state, action) => {});
   },
 });
 
