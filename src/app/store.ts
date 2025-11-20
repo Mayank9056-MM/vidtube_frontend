@@ -4,6 +4,7 @@ import videoReducer from "@/features/video/videoSlice";
 import uiReducer from "@/features/ui/uiSlice";
 import subscriptionReducer from "@/features/subscription/susbcriptionSlice";
 import likeReducer from "@/features/like/likeSlice";
+import commentReducer from "@/features/comment/commentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     ui: uiReducer,
     subscription: subscriptionReducer,
     like: likeReducer,
+    comment: commentReducer,
   },
   devTools: import.meta.env.MODE !== "production",
 });
