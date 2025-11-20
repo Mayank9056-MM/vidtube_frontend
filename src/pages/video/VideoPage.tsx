@@ -30,7 +30,8 @@ import { setSubscriptionState } from "@/features/subscription/susbcriptionSlice"
 import { logger } from "@/utls/logger";
 import { getAllLikedVideos, toggleVideoLike } from "@/features/like/likeThunks";
 import { setInitialLikeState } from "@/features/like/likeSlice";
-
+import { createComment, getComments } from "@/features/comment/commentThunks";
+import { useToast } from "@/hooks/useToast";
 
 const recommendedVideos = [
   {
@@ -115,9 +116,9 @@ export default function VideoPage() {
   const [disliked, setDisliked] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [comment, setComment] = useState("");
-  const [comments, setComments] = useState(mockComments);
   const [theme] = useState("light");
   const dispatch = useAppDispatch();
+  const { showError, showSuccess, showInfo } = useToast();
 
   const videoData = useAppSelector(
     (state: RootState) => state.video.selectedVideo
@@ -137,9 +138,11 @@ export default function VideoPage() {
   );
 
   const user = useAppSelector((state: RootState) => state.user.user);
-  const { isLiked, likesCount,likedVideos } = useAppSelector(
+  const { isLiked, likesCount, likedVideos } = useAppSelector(
     (state: RootState) => state.like
   );
+
+  const comments = useAppSelector((state: RootState) => state.comment.comments);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -185,18 +188,29 @@ export default function VideoPage() {
   useEffect(() => {
     if (!videoData?.owner?._id) return; // wait until owner id is loaded
     dispatch(getAllLikedVideos());
-  },[videoData?.owner?._id,dispatch])
+  }, [videoData?.owner?._id, dispatch]);
 
   useEffect(() => {
-    console.log(videoData?.isLiked, videoData?.likeCount,videoData,"videoData");
-  if (videoData) {
-    dispatch(setInitialLikeState({
-      isLiked: !!videoData.isLiked,
-      likesCount: videoData.likeCount
-    }));
-  }
-}, [videoData]);
+    console.log(
+      videoData?.isLiked,
+      videoData?.likeCount,
+      videoData,
+      "videoData"
+    );
+    if (videoData) {
+      dispatch(
+        setInitialLikeState({
+          isLiked: !!videoData.isLiked,
+          likesCount: videoData.likeCount,
+        })
+      );
+    }
+  }, [videoData]);
 
+  useEffect(() => {
+    if (!videoId) return;
+    dispatch(getComments(videoId));
+  }, [videoId, dispatch]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -253,17 +267,12 @@ export default function VideoPage() {
     dispatch(getSubscribedChannels(user?._id));
   };
 
-  const handleComment = () => {
+  const handleComment = async () => {
     if (comment.trim()) {
-      const newComment = {
-        id: comments.length + 1,
-        user: "Current User",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=CurrentUser",
-        comment: comment,
-        likes: 0,
-        time: "Just now",
-      };
-      setComments([newComment, ...comments]);
+      await dispatch(createComment({ content: comment, videoId }));
+      dispatch(getComments(videoId));
+      // setComments([newComment, ...comments]);
+      showInfo("Comment added successfully");
       setComment("");
     }
   };
@@ -558,29 +567,30 @@ export default function VideoPage() {
 
                 {/* Comments List */}
                 <div className="space-y-4">
-                  {comments.map((c) => (
-                    <div key={c.id} className="flex gap-3">
+                  {comments?.map((c) => (
+                    <div key={c._id} className="flex gap-3">
                       <img
-                        src={c.avatar}
-                        alt={c.user}
+                        src={c?.owner?.avatar}
+                        alt={c?.owner?.username}
                         className="w-10 h-10 rounded-full flex-shrink-0"
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold text-gray-900 dark:text-white">
-                            {c.user}
+                            {c?.owner?.username}
                           </span>
                           <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {c.time}
+                            {c?.createdAt}
                           </span>
                         </div>
                         <p className="text-gray-700 dark:text-gray-300 mb-2">
-                          {c.comment}
+                          {c?.content}
                         </p>
                         <div className="flex items-center gap-4">
                           <button className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             <ThumbsUp className="w-4 h-4" />
                             <span>{c.likes}</span>
+                            {/* TODO: get comment like */}
                           </button>
                           <button className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             <ThumbsDown className="w-4 h-4" />

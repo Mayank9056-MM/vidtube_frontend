@@ -11,7 +11,7 @@ export const createCommentApi = async ({
   try {
     const res = await axiosInstance.post(
       `/api/v1/comments/add-comment/${videoId}`,
-      content
+      {content}
     );
     logger.info("res from create comment api => ", res);
     return res.data.data;
@@ -31,7 +31,7 @@ export const updateCommentApi = async ({
   try {
     const res = await axiosInstance.patch(
       `/api/v1/comments/update-comment/${commentId}`,
-      content
+      {content}
     );
     logger.info("res from update comment api => ", res);
     return res.data.data;

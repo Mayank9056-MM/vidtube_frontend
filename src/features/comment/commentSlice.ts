@@ -7,6 +7,10 @@ import {
 } from "./commentThunks";
 
 export interface Comment {
+  owner: {
+    avatar: string;
+    username: string;
+  };
   _id: string;
   content: string;
   userId: string;
@@ -41,7 +45,7 @@ export const commentSlice = createSlice({
       })
       .addCase(getComments.fulfilled, (state, action) => {
         state.loading = false;
-        state.comments = action.payload;
+        state.comments = action.payload.comments;
       })
       .addCase(getComments.rejected, (state, action) => {
         state.loading = false;
