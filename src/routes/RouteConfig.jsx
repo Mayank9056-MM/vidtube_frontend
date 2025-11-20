@@ -2,7 +2,8 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Home from "@/pages/Home";
 import UploadPage from "@/pages/Upload";
-import VideoPage from "@/pages/video/VideoPage"
+import VideoPage from "@/pages/video/VideoPage";
+import TweetPage from "@/pages/tweet/TweetPage";
 
 export const publicRoutes = [
   {
@@ -27,5 +28,9 @@ export const privateRoutes = [
   {
     path: "/watch/:videoId",
     element: <VideoPage />,
-  }
+  },
+  {
+    path: "/tweets",
+    element: <TweetPage />,
+  },
 ];
