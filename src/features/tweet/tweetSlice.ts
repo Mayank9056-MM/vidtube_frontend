@@ -1,16 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import {
-  createTweetThunk,
-  getUserTweetsThunk,
-  updateTweetThunk,
-  deleteTweetThunk,
+  createTweet,
+  deleteTweet,
   getAllTweets,
+  getUserTweets,
+  updateTweet,
 } from "./tweetThunks";
 
 export interface Tweet {
   _id: string;
   content: string;
+  owner: {
+    username: string;
+    avatar: string;
+    _id: string;
+    fullName: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -37,17 +43,17 @@ const tweetSlice = createSlice({
   extraReducers: (builder) => {
     // GET TWEETS
     builder
-      .addCase(getUserTweetsThunk.pending, (state) => {
+      .addCase(getUserTweets.pending, (state) => {
         state.loading = true;
       })
       .addCase(
-        getUserTweetsThunk.fulfilled,
+        getUserTweets.fulfilled,
         (state, action: PayloadAction<Tweet[]>) => {
           state.loading = false;
           state.tweets = action.payload;
         }
       )
-      .addCase(getUserTweetsThunk.rejected, (state, action) => {
+      .addCase(getUserTweets.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
@@ -70,40 +76,37 @@ const tweetSlice = createSlice({
 
     // CREATE TWEET
     builder
-      .addCase(createTweetThunk.pending, (state) => {
+      .addCase(createTweet.pending, (state) => {
         state.loading = true;
       })
-      .addCase(
-        createTweetThunk.fulfilled,
-        (state, action: PayloadAction<Tweet>) => {
-          state.loading = false;
-          state.tweets.unshift(action.payload);
-        }
-      )
-      .addCase(createTweetThunk.rejected, (state, action) => {
+      .addCase(createTweet.fulfilled, (state, action: PayloadAction<Tweet>) => {
+        state.loading = false;
+        state.tweets.unshift(action.payload);
+      })
+      .addCase(createTweet.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
 
     // UPDATE TWEET
     builder
-      .addCase(updateTweetThunk.fulfilled, (state, action) => {
+      .addCase(updateTweet.fulfilled, (state, action) => {
         const updatedTweet = action.payload;
         state.tweets = state.tweets.map((tweet) =>
           tweet._id === updatedTweet._id ? updatedTweet : tweet
         );
       })
-      .addCase(updateTweetThunk.rejected, (state, action) => {
+      .addCase(updateTweet.rejected, (state, action) => {
         state.error = action.payload as string;
       });
 
     // DELETE TWEET
     builder
-      .addCase(deleteTweetThunk.fulfilled, (state, action) => {
+      .addCase(deleteTweet.fulfilled, (state, action) => {
         const { tweetId } = action.payload;
         state.tweets = state.tweets.filter((t) => t._id !== tweetId);
       })
-      .addCase(deleteTweetThunk.rejected, (state, action) => {
+      .addCase(deleteTweet.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },

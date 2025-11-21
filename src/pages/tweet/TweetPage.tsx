@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,9 @@ import {
   Hash,
   Sparkles,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { createTweet, getAllTweets } from "@/features/tweet/tweetThunks";
+import { useToast } from "@/hooks/useToast";
 
 // Mock tweet data
 const initialTweets = [
@@ -96,49 +99,77 @@ const trendingTopics = [
 export default function TweetPage() {
   const theme = useSelector((state: RootState) => state.user.theme);
   const [tweetContent, setTweetContent] = useState("");
-  const [tweets, setTweets] = useState(initialTweets);
+  // const [tweets, setTweets] = useState(initialTweets);
   const [isPosting, setIsPosting] = useState(false);
+  const dispatch = useAppDispatch();
+  const { showSuccess, showInfo, showError } = useToast();
+  const { userTweets, tweets } = useAppSelector(
+    (state: RootState) => state.tweet
+  );
+
+  useEffect(() => {
+    const AllTweets = async () => {
+      try {
+        await dispatch(getAllTweets());
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    AllTweets();
+  }, [dispatch]);
 
   const handlePostTweet = async () => {
     if (tweetContent.trim().length === 0) return;
 
     setIsPosting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      const newTweet = {
-        id: tweets.length + 1,
-        author: {
-          name: "You",
-          username: "@yourhandle",
-          avatar: "YO",
-        },
-        content: tweetContent,
-        timestamp: "Just now",
-        likes: 0,
-        retweets: 0,
-        replies: 0,
-        isLiked: false,
-      };
-
-      setTweets([newTweet, ...tweets]);
+    try {
+      setIsPosting(true);
+      await dispatch(createTweet(tweetContent));
       setTweetContent("");
+      showSuccess("Tweet created successfully");
+    } catch (error) {
+      console.log(error);
+    } finally {
       setIsPosting(false);
-    }, 1000);
+    }
+
+    // // Simulate API call
+    // setTimeout(() => {
+    //   const newTweet = {
+    //     id: tweets.length + 1,
+    //     author: {
+    //       name: "You",
+    //       username: "@yourhandle",
+    //       avatar: "YO",
+    //     },
+    //     content: tweetContent,
+    //     timestamp: "Just now",
+    //     likes: 0,
+    //     retweets: 0,
+    //     replies: 0,
+    //     isLiked: false,
+    //   };
+
+    //   setTweets([newTweet, ...tweets]);
+    //   setTweetContent("");
+    //   setIsPosting(false);
+    // }, 1000);
   };
 
   const handleLikeTweet = (tweetId: number) => {
-    setTweets(
-      tweets.map((tweet) =>
-        tweet.id === tweetId
-          ? {
-              ...tweet,
-              isLiked: !tweet.isLiked,
-              likes: tweet.isLiked ? tweet.likes - 1 : tweet.likes + 1,
-            }
-          : tweet
-      )
-    );
+    // setTweets(
+    //   tweets.map((tweet) =>
+    //     tweet.id === tweetId
+    //       ? {
+    //           ...tweet,
+    //           isLiked: !tweet.isLiked,
+    //           likes: tweet.isLiked ? tweet.likes - 1 : tweet.likes + 1,
+    //         }
+    //       : tweet
+    //   )
+    // );
   };
 
   const maxChars = 280;
@@ -250,28 +281,28 @@ export default function TweetPage() {
 
               {/* Tweet Feed */}
               <div className="space-y-4">
-                {tweets.map((tweet) => (
+                {tweets && tweets?.map((tweet) => (
                   <Card
-                    key={tweet.id}
+                    key={tweet?._id}
                     className="shadow-lg border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl hover:shadow-xl transition-all duration-300"
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-red-700 dark:from-red-600 dark:to-red-800 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                          {tweet.author.avatar}
+                          <img src= {tweet?.owner?.avatar} alt="" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
                               <p className="font-bold text-gray-900 dark:text-white truncate">
-                                {tweet.author.name}
+                                {tweet?.owner?.fullName}
                               </p>
                               <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                                {tweet.author.username}
+                                {tweet?.owner?.username}
                               </p>
                             </div>
                             <span className="text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">
-                              {tweet.timestamp}
+                              {tweet?.createdAt}
                             </span>
                           </div>
                         </div>

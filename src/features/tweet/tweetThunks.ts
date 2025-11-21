@@ -8,7 +8,7 @@ import {
 } from "@/api/tweet/tweetApi";
 
 // CREATE TWEET
-export const createTweetThunk = createAsyncThunk(
+export const createTweet = createAsyncThunk(
   "tweets/createTweet",
   async (content: string, { rejectWithValue }) => {
     try {
@@ -34,7 +34,7 @@ export const getAllTweets = createAsyncThunk(
 )
 
 // GET USER TWEETS
-export const getUserTweetsThunk = createAsyncThunk(
+export const getUserTweets = createAsyncThunk(
   "tweets/getUserTweets",
   async (_, { rejectWithValue }) => {
     try {
@@ -47,7 +47,7 @@ export const getUserTweetsThunk = createAsyncThunk(
 );
 
 // UPDATE TWEET
-export const updateTweetThunk = createAsyncThunk(
+export const updateTweet = createAsyncThunk(
   "tweets/updateTweet",
   async (
     { tweetId, content }: { tweetId: string; content: string },
@@ -63,7 +63,7 @@ export const updateTweetThunk = createAsyncThunk(
 );
 
 // DELETE TWEET
-export const deleteTweetThunk = createAsyncThunk(
+export const deleteTweet = createAsyncThunk(
   "tweets/deleteTweet",
   async (tweetId: string, { rejectWithValue }) => {
     try {

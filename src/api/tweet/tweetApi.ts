@@ -18,7 +18,7 @@ export const allTweetsApi = async () => {
   try {
     const res = await axiosInstance.get("/api/v1/tweets/");
     logger.info("res from get all tweets => ", res);
-    return res.data.data;
+    return res.data.data.tweets;
   } catch (error) {
     console.log(error);
     throw error;
