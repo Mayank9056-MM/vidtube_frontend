@@ -377,9 +377,21 @@ export default function TweetPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {[
-                      { name: "Tech Weekly", handle: "@techweekly", avatar: "TW" },
-                      { name: "Video Masters", handle: "@videomasters", avatar: "VM" },
-                      { name: "Creative Hub", handle: "@creativehub", avatar: "CH" },
+                      {
+                        name: "Tech Weekly",
+                        handle: "@techweekly",
+                        avatar: "TW",
+                      },
+                      {
+                        name: "Video Masters",
+                        handle: "@videomasters",
+                        avatar: "VM",
+                      },
+                      {
+                        name: "Creative Hub",
+                        handle: "@creativehub",
+                        avatar: "CH",
+                      },
                     ].map((user, index) => (
                       <div
                         key={index}
