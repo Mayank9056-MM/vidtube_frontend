@@ -25,9 +25,16 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { createTweet, getAllTweets } from "@/features/tweet/tweetThunks";
+import {
+  createTweet,
+  deleteTweet,
+  getAllTweets,
+  getUserTweets,
+  updateTweet,
+} from "@/features/tweet/tweetThunks";
 import { useToast } from "@/hooks/useToast";
 import { formatDate } from "@/utls/helpers";
+import type { Tweet } from "@/features/tweet/tweetSlice";
 
 const trendingTopics = [
   { tag: "VidTubeLive", tweets: "12.5K" },
@@ -49,11 +56,15 @@ export default function TweetPage() {
   const dispatch = useAppDispatch();
   const { showSuccess, showError } = useToast();
   const { tweets } = useAppSelector((state: RootState) => state.tweet);
+  const { user } = useAppSelector((state: RootState) => state.user);
+  const [editingTweet, setEditingTweet] = useState<Tweet | null>(null);
+  const [editContent, setEditContent] = useState("");
 
   useEffect(() => {
     const AllTweets = async () => {
       try {
         await dispatch(getAllTweets());
+        await dispatch(getUserTweets());
       } catch (error) {
         console.log(error);
       }
@@ -79,12 +90,72 @@ export default function TweetPage() {
     }
   };
 
+  const openEditModal = (tweet: Tweet) => {
+    setEditingTweet(tweet);
+    setEditContent(tweet.content);
+  };
+
+  const handleDelete = async (tweetId: string) => {
+    try {
+      await dispatch(deleteTweet(tweetId)).unwrap();
+      showSuccess("Tweet deleted");
+    } catch (error) {
+      showError("Failed to delete tweet");
+    }
+  };
+
+  const handleUpdateTweet = async () => {
+    if (!editingTweet) return;
+    try {
+      await dispatch(
+        updateTweet({ tweetId: editingTweet._id, content: editContent })
+      ).unwrap();
+      showSuccess("Tweet updated");
+      setEditingTweet(null);
+    } catch (err) {
+      showError("Failed to update tweet");
+    }
+  };
+
   const maxChars = 280;
   const charsRemaining = maxChars - tweetContent.length;
   const charPercentage = (charsRemaining / maxChars) * 100;
 
   return (
     <div className={theme === "dark" ? "dark" : ""}>
+      {editingTweet && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <Card className="p-6 w-[400px] bg-white dark:bg-gray-900 border">
+            <h2 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
+              Edit Tweet
+            </h2>
+
+            <Textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="min-h-[120px] bg-gray-100 dark:bg-gray-800"
+            />
+
+            <div className="flex justify-end gap-3 mt-4">
+              <Button
+                onClick={() => setEditingTweet(null)}
+                variant="outline"
+                className="border-gray-400 dark:border-gray-600"
+              >
+                Cancel
+              </Button>
+
+              <Button
+                onClick={handleUpdateTweet}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                Save
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50/20 dark:from-gray-950 dark:via-black dark:to-red-950/10 transition-colors duration-300">
         {/* Header - Sticky on mobile */}
         <div className="sticky top-0 z-30 backdrop-blur-xl bg-white/80 dark:bg-gray-950/80 border-b border-gray-200 dark:border-gray-800 px-4 py-3 md:hidden">
@@ -251,7 +322,9 @@ export default function TweetPage() {
                               />
                             ) : (
                               <span className="text-white font-bold text-sm sm:text-lg">
-                                {tweet?.owner?.fullName?.charAt(0).toUpperCase()}
+                                {tweet?.owner?.fullName
+                                  ?.charAt(0)
+                                  .toUpperCase()}
                               </span>
                             )}
                           </div>
@@ -269,14 +342,27 @@ export default function TweetPage() {
                                 <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                                   {formatDate(tweet?.createdAt)}
                                 </span>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
-                                >
-                                  <MoreHorizontal className="w-4 h-4" />
-                                </Button>
                               </div>
+                              {/* Show edit/delete ONLY if user owns tweet */}
+                              {tweet.owner._id === user?._id && (
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => openEditModal(tweet)}
+                                  >
+                                    Edit
+                                  </Button>
+
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => handleDelete(tweet._id)}
+                                  >
+                                    Delete
+                                  </Button>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -294,7 +380,9 @@ export default function TweetPage() {
                             className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 gap-1.5 sm:gap-2 h-8 sm:h-9 px-2 sm:px-3"
                           >
                             <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                            <span className="text-xs sm:text-sm">{tweet.replies || 0}</span>
+                            <span className="text-xs sm:text-sm">
+                              {tweet.replies || 0}
+                            </span>
                           </Button>
                           <Button
                             variant="ghost"
@@ -302,7 +390,9 @@ export default function TweetPage() {
                             className="text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/30 gap-1.5 sm:gap-2 h-8 sm:h-9 px-2 sm:px-3"
                           >
                             <Repeat2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                            <span className="text-xs sm:text-sm">{tweet.retweets || 0}</span>
+                            <span className="text-xs sm:text-sm">
+                              {tweet.retweets || 0}
+                            </span>
                           </Button>
                           <Button
                             variant="ghost"
@@ -310,7 +400,9 @@ export default function TweetPage() {
                             className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 gap-1.5 sm:gap-2 h-8 sm:h-9 px-2 sm:px-3"
                           >
                             <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
-                            <span className="text-xs sm:text-sm">{tweet.likes || 0}</span>
+                            <span className="text-xs sm:text-sm">
+                              {tweet.likes || 0}
+                            </span>
                           </Button>
                           <Button
                             variant="ghost"

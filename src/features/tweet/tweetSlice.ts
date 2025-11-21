@@ -41,7 +41,7 @@ const tweetSlice = createSlice({
   reducers: {},
 
   extraReducers: (builder) => {
-    // GET TWEETS
+    // GET USER TWEETS
     builder
       .addCase(getUserTweets.pending, (state) => {
         state.loading = true;
@@ -50,13 +50,15 @@ const tweetSlice = createSlice({
         getUserTweets.fulfilled,
         (state, action: PayloadAction<Tweet[]>) => {
           state.loading = false;
-          state.tweets = action.payload;
+          state.userTweets = action.payload.tweets;
         }
       )
       .addCase(getUserTweets.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
+
+    // ALL TWEETS
 
     builder
       .addCase(getAllTweets.pending, (state) => {
