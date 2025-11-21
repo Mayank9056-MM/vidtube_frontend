@@ -1,4 +1,3 @@
-
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import {
@@ -6,7 +5,9 @@ import {
   getUserTweetsThunk,
   updateTweetThunk,
   deleteTweetThunk,
+  getAllTweets,
 } from "./tweetThunks";
+import { get } from "react-hook-form";
 
 export interface Tweet {
   _id: string;
@@ -17,12 +18,14 @@ export interface Tweet {
 
 interface TweetState {
   tweets: Tweet[];
+  userTweets: Tweet[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: TweetState = {
   tweets: [],
+  userTweets: [],
   loading: false,
   error: null,
 };
@@ -46,6 +49,22 @@ const tweetSlice = createSlice({
         }
       )
       .addCase(getUserTweetsThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    builder
+      .addCase(getAllTweets.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(
+        getAllTweets.fulfilled,
+        (state, action: PayloadAction<Tweet[]>) => {
+          state.loading = false;
+          state.tweets = action.payload;
+        }
+      )
+      .addCase(getAllTweets.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

@@ -1,9 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
-  createTweet,
-  getUserTweets,
-  updateTweet,
-  deleteTweet,
+ allTweetsApi,
+ createTweetApi,
+ deleteTweetApi,
+ getUserTweetsApi,
+ updateTweetApi
 } from "@/api/tweet/tweetApi";
 
 // CREATE TWEET
@@ -11,7 +12,7 @@ export const createTweetThunk = createAsyncThunk(
   "tweets/createTweet",
   async (content: string, { rejectWithValue }) => {
     try {
-      const data = await createTweet(content);
+      const data = await createTweetApi(content);
       return data;
     } catch (error: any) {
       return rejectWithValue(error?.response?.data || "Failed to create tweet");
@@ -19,12 +20,25 @@ export const createTweetThunk = createAsyncThunk(
   }
 );
 
+// All tweets
+export const getAllTweets = createAsyncThunk(
+    "tweets/getAllTweets",
+    async(_,{rejectWithValue}) => {
+       try {
+         const data = await allTweetsApi();
+         return data;
+       } catch (error) {
+        return rejectWithValue(error?.response?.data || "Failed to fetch all tweets")
+       }
+    }
+)
+
 // GET USER TWEETS
 export const getUserTweetsThunk = createAsyncThunk(
   "tweets/getUserTweets",
   async (_, { rejectWithValue }) => {
     try {
-      const data = await getUserTweets();
+      const data = await getUserTweetsApi();
       return data;
     } catch (error: any) {
       return rejectWithValue(error?.response?.data || "Failed to fetch tweets");
@@ -40,7 +54,7 @@ export const updateTweetThunk = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const data = await updateTweet(tweetId, content);
+      const data = await updateTweetApi(tweetId, content);
       return data;
     } catch (error: any) {
       return rejectWithValue(error?.response?.data || "Failed to update tweet");
@@ -53,7 +67,7 @@ export const deleteTweetThunk = createAsyncThunk(
   "tweets/deleteTweet",
   async (tweetId: string, { rejectWithValue }) => {
     try {
-      const data = await deleteTweet(tweetId);
+      const data = await deleteTweetApi(tweetId);
       return { tweetId, ...data };
     } catch (error: any) {
       return rejectWithValue(error?.response?.data || "Failed to delete tweet");
