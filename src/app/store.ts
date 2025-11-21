@@ -5,6 +5,7 @@ import uiReducer from "@/features/ui/uiSlice";
 import subscriptionReducer from "@/features/subscription/susbcriptionSlice";
 import likeReducer from "@/features/like/likeSlice";
 import commentReducer from "@/features/comment/commentSlice";
+import tweetReducer from "@/features/tweet/tweetSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     subscription: subscriptionReducer,
     like: likeReducer,
     comment: commentReducer,
+    tweet: tweetReducer,
   },
   devTools: import.meta.env.MODE !== "production",
 });

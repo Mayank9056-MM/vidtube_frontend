@@ -7,7 +7,6 @@ import {
   deleteTweetThunk,
   getAllTweets,
 } from "./tweetThunks";
-import { get } from "react-hook-form";
 
 export interface Tweet {
   _id: string;
