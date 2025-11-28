@@ -10,6 +10,12 @@ interface LikeState {
   likedVideos: string[];
   isLiked: boolean | null;
   likesCount: number;
+  tweetLikes: {
+    [tweetId: string]: {
+      isLiked: boolean;
+      likesCount: number;
+    };
+  };
   commentLiked: boolean | null;
   tweetLiked: boolean | null;
   loading: boolean;
@@ -22,6 +28,7 @@ const initialState: LikeState = {
   likesCount: 0,
   commentLiked: null,
   tweetLiked: null,
+  tweetLikes: {},
   loading: false,
   error: null,
 };
@@ -30,10 +37,10 @@ const likeSlice = createSlice({
   name: "likes",
   initialState,
   reducers: {
-     setInitialLikeState: (state, action) => {
-    state.isLiked = action.payload.isLiked;
-    state.likesCount = action.payload.likesCount;
-  }
+    setInitialLikeState: (state, action) => {
+      state.isLiked = action.payload.isLiked;
+      state.likesCount = action.payload.likesCount;
+    },
   },
 
   extraReducers: (builder) => {
@@ -70,9 +77,14 @@ const likeSlice = createSlice({
         state.loading = true;
       })
       .addCase(toggleTweetLike.fulfilled, (state, action) => {
-        state.loading = false;
-        state.tweetLiked = action.payload;
+        const { tweetId, isLiked, totalLikes } = action.payload;
+
+        state.tweetLikes[tweetId] = {
+          isLiked,
+          likesCount: totalLikes,
+        };
       })
+
       .addCase(toggleTweetLike.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -94,6 +106,5 @@ const likeSlice = createSlice({
 });
 
 export const { setInitialLikeState } = likeSlice.actions;
-
 
 export default likeSlice.reducer;
