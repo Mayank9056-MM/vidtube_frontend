@@ -4,6 +4,7 @@ import Home from "@/pages/Home";
 import UploadPage from "@/pages/Upload";
 import VideoPage from "@/pages/video/VideoPage";
 import TweetPage from "@/pages/tweet/TweetPage";
+import SubscriptionPage from "@/pages/subscription/SubscriptionsPage";
 
 export const publicRoutes = [
   {
@@ -33,4 +34,8 @@ export const privateRoutes = [
     path: "/tweets",
     element: <TweetPage />,
   },
+  {
+    path: "/subscription",
+    element: <SubscriptionPage />
+  }
 ];
