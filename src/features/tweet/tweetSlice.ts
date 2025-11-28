@@ -17,6 +17,8 @@ export interface Tweet {
     _id: string;
     fullName: string;
   };
+  isLiked: boolean;
+  totalLikes: number;
   createdAt: string;
   updatedAt: string;
 }

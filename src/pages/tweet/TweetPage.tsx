@@ -64,8 +64,7 @@ export default function TweetPage() {
     (state: RootState) => state.like.tweetLikes
   );
 
-  console.log(tweetLikes,"tweetlike from tweetpage")
-
+  console.log(tweetLikes, "tweetlike from tweetpage");
 
   useEffect(() => {
     const AllTweets = async () => {
@@ -316,12 +315,18 @@ export default function TweetPage() {
               <div className="space-y-3 sm:space-y-4">
                 {tweets && tweets.length > 0 ? (
                   tweets.map((tweet) => {
-                    const likeData = tweetLikes[tweet._id] || {
-                      isLiked: false,
-                      likesCount: 0,
-                    };
-                    const isLiked = likeData?.isLiked || false;
-                    const likesCount = likeData?.likesCount || 0;
+                    // const likeData = tweetLikes[tweet._id] || {
+                    //   isLiked: false,
+                    //   likesCount: 0,
+                    // };
+                    // const isLiked = tweet?.isLiked || false;
+                    // const likesCount = tweet?.totalLikes || 0;
+
+                    const localLikeData = tweetLikes[tweet._id];
+
+                    const isLiked = localLikeData?.isLiked ?? tweet.isLiked;
+                    const likesCount =
+                      localLikeData?.likesCount ?? tweet.totalLikes;
 
                     return (
                       <Card
