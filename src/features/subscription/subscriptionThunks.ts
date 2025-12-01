@@ -1,5 +1,7 @@
 import {
+  getChannelStatsApi,
   getChannelSubscribersApi,
+  getChannelVideosApi,
   getSubscribedChannelsApi,
   toggleSubscriptionApi,
 } from "@/api/susbscriptionApi";
@@ -45,3 +47,25 @@ export const getChannelSubscribers = createAsyncThunk(
     }
   }
 );
+
+export const getChannelStats = createAsyncThunk(
+  "subscription/getChannelStats",
+  async (username: string, { rejectWithValue }) => {
+    try {
+      const res = await getChannelStatsApi(username);
+      return res;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  })
+
+export const getChannelVideos = createAsyncThunk(
+  "subscription/getChannelVideos",
+  async (username: string, { rejectWithValue }) => {
+    try {
+      const res = await getChannelVideosApi(username);
+      return res;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  })

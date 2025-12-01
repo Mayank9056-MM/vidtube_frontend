@@ -17,10 +17,10 @@ import {
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { getSubscribedChannels } from "@/features/subscription/subscriptionThunks";
 import type { RootState } from "@/app/store";
+import { useNavigate } from "react-router-dom";
 
 export default function SubscriptionsPage() {
   const [theme] = useState("dark");
-  const [selectedChannel, setSelectedChannel] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [hoveredChannel, setHoveredChannel] = useState(null);
@@ -29,6 +29,7 @@ export default function SubscriptionsPage() {
   const subscribedChannels = useAppSelector(
     (state: RootState) => state.subscription.subscribedChannels
   );
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getSubscibers = async () => {
@@ -107,7 +108,8 @@ export default function SubscriptionsPage() {
                 All Subscriptions
               </h2>
               <div className="text-sm text-slate-600 dark:text-slate-400">
-                {filteredChannels.length} channel{filteredChannels.length !== 1 ? 's' : ''}
+                {filteredChannels.length} channel
+                {filteredChannels.length !== 1 ? "s" : ""}
               </div>
             </div>
 
@@ -123,22 +125,33 @@ export default function SubscriptionsPage() {
                   key={sub._id}
                   onMouseEnter={() => setHoveredChannel(sub._id)}
                   onMouseLeave={() => setHoveredChannel(null)}
-                  onClick={() => setSelectedChannel(sub?._id)}
+                  onClick={() => navigate(`/channel/${sub.channel.username}`)}
                   className="group overflow-hidden border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02] relative"
                 >
                   {/* Cover Image */}
                   <div
                     className="h-24 relative overflow-hidden"
-                    style={{ background: sub.channel.coverImage || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+                    style={{
+                      backgroundImage: `url(${
+                        sub?.channel?.coverImage || "default-url-here"
+                      })`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                    }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                    
+
                     {/* Notification Bell */}
                     <div className="absolute top-3 right-3 flex gap-2">
                       <button
                         onClick={(e) => toggleNotifications(sub?._id, e)}
                         className="p-2 rounded-lg bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all border border-white/20 hover:border-white/40"
-                        title={sub?.notificationsOn ? "Notifications on" : "Notifications off"}
+                        title={
+                          sub?.notificationsOn
+                            ? "Notifications on"
+                            : "Notifications off"
+                        }
                       >
                         {sub?.notificationsOn || true ? (
                           <Bell className="w-4 h-4 text-white drop-shadow-lg" />
@@ -149,7 +162,13 @@ export default function SubscriptionsPage() {
                     </div>
 
                     {/* Subscribe/Unsubscribe Button - Shows on hover */}
-                    <div className={`absolute bottom-3 right-3 transition-all duration-300 ${hoveredChannel === sub._id ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+                    <div
+                      className={`absolute bottom-3 right-3 transition-all duration-300 ${
+                        hoveredChannel === sub._id
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 translate-y-2"
+                      }`}
+                    >
                       <Button
                         onClick={(e) => handleUnsubscribe(sub._id, e)}
                         size="sm"
@@ -166,16 +185,22 @@ export default function SubscriptionsPage() {
                       {/* Avatar */}
                       <div
                         className="w-14 h-14 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-xl border-3 border-white dark:border-slate-900 flex-shrink-0 overflow-hidden ring-2 ring-purple-500/20"
-                        style={{ background: sub.channel.coverImage || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+                        style={{
+                          background:
+                            sub.channel.coverImage ||
+                            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                        }}
                       >
                         {sub.channel.avatar ? (
-                          <img 
-                            src={sub.channel.avatar} 
+                          <img
+                            src={sub.channel.avatar}
                             alt={sub.channel.username}
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span>{sub.channel.username?.charAt(0).toUpperCase()}</span>
+                          <span>
+                            {sub.channel.username?.charAt(0).toUpperCase()}
+                          </span>
                         )}
                       </div>
 
@@ -189,12 +214,12 @@ export default function SubscriptionsPage() {
                             <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
                           )}
                         </div>
-                        
+
                         <p className="text-xs text-slate-600 dark:text-slate-400 mb-2 font-medium">
                           {sub?.subscribers || 0} subscribers
                         </p>
-                        
-                        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-500">
+
+                        {/* <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-500">
                           <span className="flex items-center gap-1 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                             <Video className="w-3 h-3" />
                             {sub?.totalVideos || 0}
@@ -203,7 +228,7 @@ export default function SubscriptionsPage() {
                             <Eye className="w-3 h-3" />
                             {sub?.totalViews || 0}
                           </span>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </CardContent>
@@ -222,12 +247,12 @@ export default function SubscriptionsPage() {
                     <Search className="w-10 h-10 text-purple-500 dark:text-purple-400" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                    {searchQuery ? 'No channels found' : 'No subscriptions yet'}
+                    {searchQuery ? "No channels found" : "No subscriptions yet"}
                   </h3>
                   <p className="text-slate-600 dark:text-slate-400 text-center max-w-md">
-                    {searchQuery 
-                      ? 'Try adjusting your search query to find channels'
-                      : 'Start exploring and subscribe to channels you love'}
+                    {searchQuery
+                      ? "Try adjusting your search query to find channels"
+                      : "Start exploring and subscribe to channels you love"}
                   </p>
                   {!searchQuery && (
                     <Button className="mt-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl px-6">
