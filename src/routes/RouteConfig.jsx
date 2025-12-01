@@ -35,7 +35,7 @@ export const privateRoutes = [
     element: <TweetPage />,
   },
   {
-    path: "/subscription",
+    path: "/subscriptions",
     element: <SubscriptionPage />
   }
 ];
