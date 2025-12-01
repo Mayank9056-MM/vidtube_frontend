@@ -201,6 +201,7 @@ export default function ChannelPage() {
   console.log("allVideos -> ", allVideos);
   console.log("onSelectedChannel -> ", onSelectedChannel);
   console.log(totalLikes);
+  console.log(videos, "videos");
 
   const dispatch = useAppDispatch();
 
@@ -595,7 +596,12 @@ export default function ChannelPage() {
                   <div className="relative aspect-video">
                     <div
                       className="w-full h-full"
-                      style={{ background: video?.thumbnail }}
+                      style={{
+                        backgroundImage: `url(${video?.thumbnail})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        borderColor: theme === "dark" ? "#111827" : "#ffffff",
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <div className="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center shadow-2xl">
@@ -603,7 +609,7 @@ export default function ChannelPage() {
                       </div>
                     </div>
                     <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/90 text-white text-xs font-semibold rounded">
-                      {video?.duration}
+                      {formatDuration(video?.duration)}
                     </div>
                   </div>
 
@@ -636,7 +642,7 @@ export default function ChannelPage() {
                         theme === "dark" ? "text-gray-500" : "text-gray-500"
                       }`}
                     >
-                      {video?.uploadedAt || 0}
+                      {formatDate(video?.updatedAt)}
                     </p>
                   </div>
                 </div>
