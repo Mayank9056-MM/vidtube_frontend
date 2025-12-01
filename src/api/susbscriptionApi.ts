@@ -82,9 +82,10 @@ export const getChannelStatsApi = async(username: string): Promise<object> => {
  */
 export const getChannelVideosApi = async(username: string): Promise<object[]> => {
   try {
+    console.log("hiii i am runinng............")
     const res = await axiosInstance.get(
       `/api/v1/dashboards/channel-videos/${username}`)
-      logger.info("getChannelSubscribersApi res", res);
+      logger.info("get channelvideo api res", res);
     return res.data.data;
   } catch (error) {
     console.log(error)

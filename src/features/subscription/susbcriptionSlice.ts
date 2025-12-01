@@ -4,6 +4,7 @@ import {
   getSubscribedChannels,
   getChannelSubscribers,
   getChannelStats,
+  getChannelVideos,
 } from "./subscriptionThunks";
 import type { User } from "@/types/global";
 import { get } from "react-hook-form";
@@ -127,15 +128,15 @@ export const subscriptionSlice = createSlice({
     });
 
     // Get all videos of a channel
-    builder.addCase(getAllVideos.pending, (state) => {
+    builder.addCase(getChannelVideos.pending, (state) => {
       state.loading = true;
       state.error = null;
     });
-    builder.addCase(getAllVideos.fulfilled, (state, action) => {
+    builder.addCase(getChannelVideos.fulfilled, (state, action) => {
       state.loading = false;
-      state.allVideos = action.payload.allVideo;
+      state.allVideos = action.payload.videos;
     });
-    builder.addCase(getAllVideos.rejected, (state, action) => {
+    builder.addCase(getChannelVideos.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
     });
