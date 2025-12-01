@@ -40,7 +40,7 @@ export const privateRoutes = [
     element: <SubscriptionPage />
   },
   {
-    path: "/channel",
+    path: "/channel/:username",
     element: <ChannelPage />
   }
 ];

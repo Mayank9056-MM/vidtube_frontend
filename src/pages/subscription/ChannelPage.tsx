@@ -1,91 +1,12 @@
-import { useAppSelector } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import type { RootState } from "@/app/store";
+import {
+  getChannelStats,
+  getChannelVideos,
+} from "@/features/subscription/subscriptionThunks";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-
-// Mock data - replace with actual API data
-const mockChannel = {
-  id: "1",
-  channelName: "Tech Insights Pro",
-  channelAvatar: "TI",
-  coverImage: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-  subscribers: "2.5M",
-  totalSubscribers: 2500000,
-  description:
-    "Bringing you the latest in technology, reviews, tutorials, and industry insights. Join our community of tech enthusiasts!",
-  isVerified: true,
-  isSubscribed: false,
-  totalVideos: 342,
-  totalViews: "156M",
-  totalLikes: "8.2M",
-  avgViews: "456K",
-  engagement: "5.8%",
-  joinedDate: "Jan 15, 2019",
-  uploadFrequency: "3-4 videos/week",
-};
-
-const mockVideos = [
-  {
-    id: "1",
-    title: "The Future of AI: What's Coming in 2025",
-    thumbnail: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-    views: "1.2M",
-    likes: "45K",
-    duration: "15:34",
-    uploadedAt: "2 days ago",
-    uploadDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: "2",
-    title: "Building a React App from Scratch - Complete Tutorial",
-    thumbnail: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-    views: "890K",
-    likes: "32K",
-    duration: "45:12",
-    uploadedAt: "5 days ago",
-    uploadDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: "3",
-    title: "Top 10 Gadgets You NEED in 2025",
-    thumbnail: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-    views: "2.1M",
-    likes: "78K",
-    duration: "12:45",
-    uploadedAt: "1 week ago",
-    uploadDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: "4",
-    title: "How I Built My Dream Setup - Room Tour 2025",
-    thumbnail: "linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
-    views: "560K",
-    likes: "28K",
-    duration: "18:23",
-    uploadedAt: "2 weeks ago",
-    uploadDate: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: "5",
-    title: "Photography Tips for Beginners - Get Pro Results",
-    thumbnail: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
-    views: "445K",
-    likes: "19K",
-    duration: "22:15",
-    uploadedAt: "3 weeks ago",
-    uploadDate: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: "6",
-    title: "Unboxing the Latest iPhone - Is It Worth It?",
-    thumbnail: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
-    views: "1.8M",
-    likes: "62K",
-    duration: "10:56",
-    uploadedAt: "1 month ago",
-    uploadDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-  },
-];
+import { useNavigate, useParams } from "react-router-dom";
+import { formatDate, formatDuration, formatNumber } from "@/utls/helpers";
 
 const Icon = ({ name, className = "w-5 h-5" }) => {
   const icons = {
@@ -260,22 +181,63 @@ const Icon = ({ name, className = "w-5 h-5" }) => {
 };
 
 export default function ChannelPage() {
-  const [channel, setChannel] = useState(mockChannel);
-  const [videos, setVideos] = useState(mockVideos);
+  // const [channel, setChannel] = useState(mockChannel);
+  const [videos, setVideos] = useState([]);
   const [sortOrder, setSortOrder] = useState("latest");
   const theme = "dark";
+  const { username } = useParams();
+  const {
+    allVideos,
+    error,
+    isSubscribed,
+    loading,
+    onSelectedChannel,
+    totalLikes,
+    totalSubscribers,
+    totalViews,
+    totalVideos,
+  } = useAppSelector((state: RootState) => state.subscription);
+
+  console.log("allVideos -> ", allVideos);
+  console.log("onSelectedChannel -> ", onSelectedChannel);
+  console.log(totalLikes);
+
+  const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const sortedVideos = [...mockVideos].sort((a, b) => {
-      if (sortOrder === "latest") {
-        return b.uploadDate.getTime() - a.uploadDate.getTime();
-      } else {
-        return a.uploadDate.getTime() - b.uploadDate.getTime();
+    const fetchChannelStats = async () => {
+      try {
+        await dispatch(getChannelStats(username));
+      } catch (error) {
+        console.log(error);
       }
-    });
-    setVideos(sortedVideos);
+    };
+
+    fetchChannelStats();
+  }, [dispatch, username]);
+
+  useEffect(() => {
+    const fetchAllVideos = async () => {
+      try {
+        await dispatch(getChannelVideos(username));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchAllVideos();
+  }, [dispatch, username]);
+
+  useEffect(() => {
+    // const sortedVideos = allVideos?.sort((a, b) => {
+    //   if (sortOrder === "latest") {
+    //     return b.uploadDate.getTime() - a.uploadDate.getTime();
+    //   } else {
+    //     return a.uploadDate.getTime() - b.uploadDate.getTime();
+    //   }
+    // });
+    setVideos(allVideos);
   }, [sortOrder]);
 
   const toggleSubscription = () => {
@@ -312,7 +274,11 @@ export default function ChannelPage() {
         >
           <div
             className="h-32 sm:h-40 md:h-48 lg:h-56 relative"
-            style={{ background: channel.coverImage }}
+            style={{
+              backgroundImage: `url(${onSelectedChannel?.coverImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
           </div>
@@ -320,13 +286,18 @@ export default function ChannelPage() {
           <div className="px-4 sm:px-6 lg:px-8 pb-6">
             <div className="flex flex-col sm:flex-row items-start gap-4 -mt-12 sm:-mt-16">
               <div
-                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-2xl flex items-center justify-center text-white font-bold text-2xl sm:text-3xl lg:text-4xl shadow-2xl border-4 flex-shrink-0"
+                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-2xl flex items-center justify-center text-white font-bold text-2xl sm:text-3xl lg:text-4xl shadow-2xl border-4 flex-shrink-0 relative"
                 style={{
-                  background: channel.coverImage,
-                  borderColor: theme === "dark" ? "#111827" : "#ffffff",
+                  backgroundImage: `url(${onSelectedChannel?.coverImage})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
               >
-                {channel.channelAvatar}
+                <img
+                  src={onSelectedChannel?.avatar}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover rounded-2xl z-10"
+                />
               </div>
 
               <div className="flex-1 w-full sm:pt-8 lg:pt-12">
@@ -338,9 +309,9 @@ export default function ChannelPage() {
                           theme === "dark" ? "text-white" : "text-black"
                         }`}
                       >
-                        {channel.channelName}
+                        {onSelectedChannel?.username}
                       </h1>
-                      {channel.isVerified && (
+                      {onSelectedChannel?.isVerified && (
                         <Icon
                           name="checkCircle"
                           className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0"
@@ -354,7 +325,7 @@ export default function ChannelPage() {
                     >
                       <Icon name="users" className="w-4 h-4" />
                       <span className="font-medium">
-                        {channel.subscribers} subscribers
+                        {totalSubscribers || 0} subscribers
                       </span>
                     </div>
                     <p
@@ -362,21 +333,21 @@ export default function ChannelPage() {
                         theme === "dark" ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
-                      {channel.description}
+                      {onSelectedChannel?.description || ""}
                     </p>
                   </div>
 
                   <button
                     onClick={toggleSubscription}
                     className={`px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${
-                      channel.isSubscribed
+                      onSelectedChannel?.isSubscribed
                         ? theme === "dark"
                           ? "bg-gray-800 text-white hover:bg-gray-700"
                           : "bg-gray-200 text-black hover:bg-gray-300"
                         : "bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-500/30"
                     }`}
                   >
-                    {channel.isSubscribed ? (
+                    {onSelectedChannel?.isSubscribed ? (
                       <>
                         <Icon name="bell" className="w-4 h-4" />
                         Subscribed
@@ -414,7 +385,7 @@ export default function ChannelPage() {
               Total Videos
             </p>
             <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              {channel.totalVideos}
+              {totalVideos || 0}
             </p>
           </div>
 
@@ -440,7 +411,7 @@ export default function ChannelPage() {
               Total Views
             </p>
             <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              {channel.totalViews}
+              {totalViews || 0}
             </p>
           </div>
 
@@ -466,7 +437,7 @@ export default function ChannelPage() {
               Total Likes
             </p>
             <p className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent">
-              {channel.totalLikes}
+              {totalLikes || 0}
             </p>
           </div>
 
@@ -494,7 +465,7 @@ export default function ChannelPage() {
               Engagement
             </p>
             <p className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              {channel.engagement}
+              {onSelectedChannel?.engagement || ""}
             </p>
           </div>
         </div>
@@ -524,7 +495,7 @@ export default function ChannelPage() {
                     theme === "dark" ? "text-white" : "text-black"
                   }`}
                 >
-                  {channel.joinedDate}
+                  {formatDate(onSelectedChannel?.createdAt) || " "}
                 </p>
               </div>
             </div>
@@ -554,7 +525,7 @@ export default function ChannelPage() {
                     theme === "dark" ? "text-white" : "text-black"
                   }`}
                 >
-                  {channel.uploadFrequency}
+                  {onSelectedChannel?.uploadFrequency || 0}
                 </p>
               </div>
             </div>
@@ -612,9 +583,9 @@ export default function ChannelPage() {
 
           <div className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {videos.map((video) => (
+              {videos?.map((video) => (
                 <div
-                  key={video.id}
+                  key={video._id}
                   className={`group rounded-xl overflow-hidden ${
                     theme === "dark" ? "bg-gray-800/50" : "bg-white"
                   } border ${
@@ -624,7 +595,7 @@ export default function ChannelPage() {
                   <div className="relative aspect-video">
                     <div
                       className="w-full h-full"
-                      style={{ background: video.thumbnail }}
+                      style={{ background: video?.thumbnail }}
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <div className="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center shadow-2xl">
@@ -632,7 +603,7 @@ export default function ChannelPage() {
                       </div>
                     </div>
                     <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/90 text-white text-xs font-semibold rounded">
-                      {video.duration}
+                      {video?.duration}
                     </div>
                   </div>
 
@@ -644,7 +615,7 @@ export default function ChannelPage() {
                           : "text-black group-hover:text-red-600"
                       } transition-colors`}
                     >
-                      {video.title}
+                      {video?.title}
                     </h3>
                     <div
                       className={`flex items-center gap-3 text-xs ${
@@ -653,11 +624,11 @@ export default function ChannelPage() {
                     >
                       <div className="flex items-center gap-1">
                         <Icon name="eye" className="w-3 h-3" />
-                        {video.views}
+                        {video?.views || 0}
                       </div>
                       <div className="flex items-center gap-1">
                         <Icon name="thumbsUp" className="w-3 h-3" />
-                        {video.likes}
+                        {video?.likes || 0}
                       </div>
                     </div>
                     <p
@@ -665,7 +636,7 @@ export default function ChannelPage() {
                         theme === "dark" ? "text-gray-500" : "text-gray-500"
                       }`}
                     >
-                      {video.uploadedAt}
+                      {video?.uploadedAt || 0}
                     </p>
                   </div>
                 </div>
