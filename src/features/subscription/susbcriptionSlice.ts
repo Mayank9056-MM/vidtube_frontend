@@ -6,7 +6,21 @@ import {
 } from "./subscriptionThunks";
 
 export interface SubscriptionState {
-  subscribedChannels: any[];
+  subscribedChannels: [
+    {
+      channel: {
+        avatar: string;
+        email: string;
+        username: string;
+        _id: string;
+        coverImage: string;
+      };
+      createdAt: string;
+      updatedAt: string;
+      susbcriber: string;
+      _id: string;
+    }
+  ] | [];
   channelSubscribers: any[];
   totalSubscribers: number;
   isSubscribed: boolean;
@@ -55,7 +69,9 @@ export const subscriptionSlice = createSlice({
     });
     builder.addCase(getSubscribedChannels.fulfilled, (state, action) => {
       state.loading = false;
+      console.log("actin.payload -> ", action.payload);
       state.subscribedChannels = action.payload || [];
+      console.log(state.subscribedChannels, "channel subscribed");
     });
     builder.addCase(getSubscribedChannels.rejected, (state, action) => {
       state.loading = false;
@@ -70,7 +86,7 @@ export const subscriptionSlice = createSlice({
     builder.addCase(getChannelSubscribers.fulfilled, (state, action) => {
       state.loading = false;
       state.channelSubscribers = action.payload || [];
-       state.totalSubscribers = action.payload.length;
+      state.totalSubscribers = action.payload.length;
     });
     builder.addCase(getChannelSubscribers.rejected, (state, action) => {
       state.loading = false;
