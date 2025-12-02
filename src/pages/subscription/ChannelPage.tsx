@@ -7,7 +7,6 @@ import {
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatDuration, formatNumber } from "@/utls/helpers";
-import { set } from "react-hook-form";
 
 const Icon = ({ name, className = "w-5 h-5" }) => {
   const icons = {
@@ -182,7 +181,6 @@ const Icon = ({ name, className = "w-5 h-5" }) => {
 };
 
 export default function ChannelPage() {
-  // const [channel, setChannel] = useState(mockChannel);
   const [videos, setVideos] = useState([]);
   const [sortOrder, setSortOrder] = useState("latest");
   const theme = "dark";
@@ -199,13 +197,7 @@ export default function ChannelPage() {
     totalVideos,
   } = useAppSelector((state: RootState) => state.subscription);
 
-  console.log("allVideos -> ", allVideos);
-  console.log("onSelectedChannel -> ", onSelectedChannel);
-  console.log(totalLikes);
-  console.log(videos, "videos in channel page");
-
   const dispatch = useAppDispatch();
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -224,7 +216,6 @@ export default function ChannelPage() {
     dispatch(getChannelVideos(username));
   }, [dispatch, username]);
 
-  // When Redux updates → update local videos
   useEffect(() => {
     if (allVideos?.length > 0) {
       setVideos(allVideos);
@@ -235,14 +226,13 @@ export default function ChannelPage() {
     const sorted = [...videos].sort((a, b) => {
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
-
       return sortOrder === "latest" ? dateB - dateA : dateA - dateB;
     });
     setVideos(sorted);
   }, [sortOrder]);
 
   const toggleSubscription = () => {
-    setChannel((prev) => ({ ...prev, isSubscribed: !prev.isSubscribed }));
+    // Handle subscription toggle
   };
 
   return (
@@ -251,117 +241,122 @@ export default function ChannelPage() {
         theme === "dark" ? "bg-black" : "bg-white"
       } transition-colors duration-300`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="max-w-[1800px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
+        {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
           className={`flex items-center gap-2 ${
             theme === "dark"
               ? "text-gray-400 hover:text-white"
               : "text-gray-600 hover:text-black"
-          } transition-colors`}
+          } transition-colors group`}
         >
-          <Icon name="arrowLeft" />
-          <span className="text-sm font-medium">Back to channels</span>
+          <Icon name="arrowLeft" className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-xs sm:text-sm font-medium">Back to channels</span>
         </button>
 
+        {/* Channel Header Card */}
         <div
-          className={`overflow-hidden rounded-2xl ${
+          className={`overflow-hidden rounded-xl sm:rounded-2xl ${
             theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-          } shadow-xl`}
+          } shadow-xl relative`}
         >
+          {/* Cover Image - Full Background */}
           <div
-            className="h-32 sm:h-40 md:h-48 lg:h-56 relative"
+            className="absolute inset-0 opacity-20"
             style={{
               backgroundImage: `url(${onSelectedChannel?.coverImage})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          </div>
+          />
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
 
-          <div className="px-4 sm:px-6 lg:px-8 pb-6">
-            <div className="flex flex-col sm:flex-row items-start gap-4 -mt-12 sm:-mt-16">
-              <div
-                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-2xl flex items-center justify-center text-white font-bold text-2xl sm:text-3xl lg:text-4xl shadow-2xl border-4 flex-shrink-0 relative"
-                style={{
-                  backgroundImage: `url(${onSelectedChannel?.coverImage})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-              >
-                <img
-                  src={onSelectedChannel?.avatar}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover rounded-2xl z-10"
-                />
-              </div>
+          {/* Content */}
+          <div className="relative z-10">
+            {/* Top Spacer */}
+            <div className="h-16 xs:h-20 sm:h-24 md:h-28 lg:h-32" />
 
-              <div className="flex-1 w-full sm:pt-8 lg:pt-12">
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h1
-                        className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${
-                          theme === "dark" ? "text-white" : "text-black"
-                        }`}
-                      >
-                        {onSelectedChannel?.username}
-                      </h1>
-                      {onSelectedChannel?.isVerified && (
-                        <Icon
-                          name="checkCircle"
-                          className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0"
-                        />
+            {/* Channel Info */}
+            <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-4 sm:pb-6">
+              <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                {/* Avatar */}
+                <div
+                  className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-xl sm:rounded-2xl flex-shrink-0 relative border-4 shadow-2xl overflow-hidden"
+                  style={{
+                    borderColor: theme === "dark" ? "#1f2937" : "#ffffff",
+                  }}
+                >
+                  <img
+                    src={onSelectedChannel?.avatar}
+                    alt={onSelectedChannel?.username}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* Channel Details */}
+                <div className="flex-1 w-full sm:pt-2 md:pt-4">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 min-w-0">
+                      {/* Channel Name */}
+                      <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                        <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold truncate text-white">
+                          {onSelectedChannel?.username}
+                        </h1>
+                        {onSelectedChannel?.isVerified && (
+                          <Icon
+                            name="checkCircle"
+                            className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-400 flex-shrink-0"
+                          />
+                        )}
+                      </div>
+
+                      {/* Subscribers */}
+                      <div className="flex items-center gap-2 mb-2 sm:mb-3 text-xs sm:text-sm md:text-base text-gray-300">
+                        <Icon name="users" className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="font-medium">
+                          {formatNumber(totalSubscribers || 0)} subscribers
+                        </span>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-xs sm:text-sm md:text-base max-w-2xl line-clamp-2 text-gray-200">
+                        {onSelectedChannel?.description || "No description available"}
+                      </p>
+                    </div>
+
+                    {/* Subscribe Button */}
+                    <button
+                      onClick={toggleSubscription}
+                      className={`w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap ${
+                        onSelectedChannel?.isSubscribed
+                          ? "bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border border-white/30"
+                          : "bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-500/50"
+                      }`}
+                    >
+                      {onSelectedChannel?.isSubscribed ? (
+                        <>
+                          <Icon name="bell" className="w-4 h-4" />
+                          Subscribed
+                        </>
+                      ) : (
+                        "Subscribe"
                       )}
-                    </div>
-                    <div
-                      className={`flex items-center gap-2 mb-3 text-sm sm:text-base ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-600"
-                      }`}
-                    >
-                      <Icon name="users" className="w-4 h-4" />
-                      <span className="font-medium">
-                        {totalSubscribers || 0} subscribers
-                      </span>
-                    </div>
-                    <p
-                      className={`text-sm sm:text-base max-w-2xl ${
-                        theme === "dark" ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      {onSelectedChannel?.description || ""}
-                    </p>
+                    </button>
                   </div>
-
-                  <button
-                    onClick={toggleSubscription}
-                    className={`px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${
-                      onSelectedChannel?.isSubscribed
-                        ? theme === "dark"
-                          ? "bg-gray-800 text-white hover:bg-gray-700"
-                          : "bg-gray-200 text-black hover:bg-gray-300"
-                        : "bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-500/30"
-                    }`}
-                  >
-                    {onSelectedChannel?.isSubscribed ? (
-                      <>
-                        <Icon name="bell" className="w-4 h-4" />
-                        Subscribed
-                      </>
-                    ) : (
-                      "Subscribe"
-                    )}
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+          {/* Total Videos */}
           <div
-            className={`rounded-2xl p-6 ${
+            className={`rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 ${
               theme === "dark"
                 ? "bg-gradient-to-br from-blue-900/30 to-cyan-900/30"
                 : "bg-gradient-to-br from-blue-50 to-cyan-50"
@@ -369,25 +364,26 @@ export default function ChannelPage() {
               theme === "dark" ? "border-blue-800/30" : "border-blue-200/50"
             } hover:shadow-xl transition-all duration-300`}
           >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <Icon name="video" className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <Icon name="video" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
               </div>
             </div>
             <p
-              className={`text-sm mb-1 ${
+              className={`text-xs sm:text-sm mb-0.5 sm:mb-1 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-600"
               }`}
             >
               Total Videos
             </p>
-            <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              {totalVideos || 0}
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              {formatNumber(totalVideos || 0)}
             </p>
           </div>
 
+          {/* Total Views */}
           <div
-            className={`rounded-2xl p-6 ${
+            className={`rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 ${
               theme === "dark"
                 ? "bg-gradient-to-br from-purple-900/30 to-pink-900/30"
                 : "bg-gradient-to-br from-purple-50 to-pink-50"
@@ -395,25 +391,26 @@ export default function ChannelPage() {
               theme === "dark" ? "border-purple-800/30" : "border-purple-200/50"
             } hover:shadow-xl transition-all duration-300`}
           >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                <Icon name="eye" className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <Icon name="eye" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
               </div>
             </div>
             <p
-              className={`text-sm mb-1 ${
+              className={`text-xs sm:text-sm mb-0.5 sm:mb-1 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-600"
               }`}
             >
               Total Views
             </p>
-            <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              {totalViews || 0}
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              {formatNumber(totalViews || 0)}
             </p>
           </div>
 
+          {/* Total Likes */}
           <div
-            className={`rounded-2xl p-6 ${
+            className={`rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 ${
               theme === "dark"
                 ? "bg-gradient-to-br from-rose-900/30 to-orange-900/30"
                 : "bg-gradient-to-br from-rose-50 to-orange-50"
@@ -421,138 +418,77 @@ export default function ChannelPage() {
               theme === "dark" ? "border-rose-800/30" : "border-rose-200/50"
             } hover:shadow-xl transition-all duration-300`}
           >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center shadow-lg shadow-rose-500/30">
-                <Icon name="heart" className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center shadow-lg shadow-rose-500/30">
+                <Icon name="heart" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
               </div>
             </div>
             <p
-              className={`text-sm mb-1 ${
+              className={`text-xs sm:text-sm mb-0.5 sm:mb-1 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-600"
               }`}
             >
               Total Likes
             </p>
-            <p className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent">
-              {totalLikes || 0}
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent">
+              {formatNumber(totalLikes || 0)}
             </p>
           </div>
 
+          {/* Join Date */}
           <div
-            className={`rounded-2xl p-6 ${
+            className={`rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 col-span-2 lg:col-span-1 ${
               theme === "dark"
-                ? "bg-gradient-to-br from-emerald-900/30 to-teal-900/30"
-                : "bg-gradient-to-br from-emerald-50 to-teal-50"
+                ? "bg-gradient-to-br from-indigo-900/30 to-violet-900/30"
+                : "bg-gradient-to-br from-indigo-50 to-violet-50"
             } backdrop-blur-xl border ${
-              theme === "dark"
-                ? "border-emerald-800/30"
-                : "border-emerald-200/50"
+              theme === "dark" ? "border-indigo-800/30" : "border-indigo-200/50"
             } hover:shadow-xl transition-all duration-300`}
           >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                <Icon name="trendingUp" className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <Icon name="calendar" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
               </div>
             </div>
             <p
-              className={`text-sm mb-1 ${
+              className={`text-xs sm:text-sm mb-0.5 sm:mb-1 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-600"
               }`}
             >
-              Engagement
+              Joined
             </p>
-            <p className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              {onSelectedChannel?.engagement || ""}
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+              {formatDate(onSelectedChannel?.createdAt) || "N/A"}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div
-            className={`rounded-2xl p-6 ${
-              theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-            } border ${
-              theme === "dark" ? "border-gray-800" : "border-gray-200"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                <Icon name="calendar" className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p
-                  className={`text-sm ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-600"
-                  }`}
-                >
-                  Joined YouTube
-                </p>
-                <p
-                  className={`font-semibold ${
-                    theme === "dark" ? "text-white" : "text-black"
-                  }`}
-                >
-                  {formatDate(onSelectedChannel?.createdAt) || " "}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={`rounded-2xl p-6 ${
-              theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-            } border ${
-              theme === "dark" ? "border-gray-800" : "border-gray-200"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
-                <Icon name="clock" className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p
-                  className={`text-sm ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-600"
-                  }`}
-                >
-                  Upload Frequency
-                </p>
-                <p
-                  className={`font-semibold ${
-                    theme === "dark" ? "text-white" : "text-black"
-                  }`}
-                >
-                  {onSelectedChannel?.uploadFrequency || 0}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        {/* Videos Section */}
         <div
-          className={`rounded-2xl ${
+          className={`rounded-xl sm:rounded-2xl ${
             theme === "dark" ? "bg-gray-900" : "bg-gray-50"
           } border ${
             theme === "dark" ? "border-gray-800" : "border-gray-200"
           } overflow-hidden`}
         >
+          {/* Section Header */}
           <div
-            className={`p-6 border-b ${
+            className={`p-3 sm:p-4 md:p-6 border-b ${
               theme === "dark" ? "border-gray-800" : "border-gray-200"
             }`}
           >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3">
               <h2
-                className={`text-xl font-bold ${
+                className={`text-base sm:text-lg md:text-xl font-bold ${
                   theme === "dark" ? "text-white" : "text-black"
                 }`}
               >
-                All Videos
+                All Videos ({videos?.length || 0})
               </h2>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setSortOrder("latest")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                     sortOrder === "latest"
                       ? "bg-red-600 text-white shadow-lg shadow-red-500/30"
                       : theme === "dark"
@@ -564,7 +500,7 @@ export default function ChannelPage() {
                 </button>
                 <button
                   onClick={() => setSortOrder("oldest")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                     sortOrder === "oldest"
                       ? "bg-red-600 text-white shadow-lg shadow-red-500/30"
                       : theme === "dark"
@@ -578,72 +514,80 @@ export default function ChannelPage() {
             </div>
           </div>
 
-          <div className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {videos?.map((video) => (
-                <div
-                  key={video._id}
-                  className={`group rounded-xl overflow-hidden ${
-                    theme === "dark" ? "bg-gray-800/50" : "bg-white"
-                  } border ${
-                    theme === "dark" ? "border-gray-700/50" : "border-gray-200"
-                  } hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer`}
-                >
-                  <div className="relative aspect-video">
-                    <div
-                      className="w-full h-full"
-                      style={{
-                        backgroundImage: `url(${video?.thumbnail})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        borderColor: theme === "dark" ? "#111827" : "#ffffff",
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center shadow-2xl">
-                        <Icon name="play" className="w-7 h-7 text-white ml-1" />
+          {/* Videos Grid */}
+          <div className="p-3 sm:p-4 md:p-6">
+            {videos?.length > 0 ? (
+              <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
+                {videos.map((video) => (
+                  <div
+                    key={video._id}
+                    className={`group rounded-lg sm:rounded-xl overflow-hidden ${
+                      theme === "dark" ? "bg-gray-800/50" : "bg-white"
+                    } border ${
+                      theme === "dark" ? "border-gray-700/50" : "border-gray-200"
+                    } hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer`}
+                  >
+                    {/* Thumbnail */}
+                    <div className="relative aspect-video">
+                      <div
+                        className="w-full h-full bg-gray-700"
+                        style={{
+                          backgroundImage: `url(${video?.thumbnail})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-red-600 flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
+                          <Icon name="play" className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white ml-1" />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-black/90 text-white text-[10px] sm:text-xs font-semibold rounded">
+                        {formatDuration(video?.duration)}
                       </div>
                     </div>
-                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/90 text-white text-xs font-semibold rounded">
-                      {formatDuration(video?.duration)}
-                    </div>
-                  </div>
 
-                  <div className="p-4">
-                    <h3
-                      className={`font-semibold mb-2 line-clamp-2 ${
-                        theme === "dark"
-                          ? "text-white group-hover:text-red-400"
-                          : "text-black group-hover:text-red-600"
-                      } transition-colors`}
-                    >
-                      {video?.title}
-                    </h3>
-                    <div
-                      className={`flex items-center gap-3 text-xs ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-600"
-                      }`}
-                    >
-                      <div className="flex items-center gap-1">
-                        <Icon name="eye" className="w-3 h-3" />
-                        {video?.views || 0}
+                    {/* Video Info */}
+                    <div className="p-2.5 sm:p-3 md:p-4">
+                      <h3
+                        className={`font-semibold text-xs sm:text-sm mb-1.5 sm:mb-2 line-clamp-2 min-h-[2.5rem] sm:min-h-[2.8rem] ${
+                          theme === "dark"
+                            ? "text-white group-hover:text-red-400"
+                            : "text-black group-hover:text-red-600"
+                        } transition-colors`}
+                      >
+                        {video?.title}
+                      </h3>
+                      <div
+                        className={`flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1">
+                          <Icon name="eye" className="w-3 h-3" />
+                          <span>{formatNumber(video?.views || 0)}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Icon name="thumbsUp" className="w-3 h-3" />
+                          <span>{formatNumber(video?.likes || 0)}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Icon name="thumbsUp" className="w-3 h-3" />
-                        {video?.likes || 0}
-                      </div>
+                      <p
+                        className={`text-[10px] sm:text-xs mt-1.5 sm:mt-2 ${
+                          theme === "dark" ? "text-gray-500" : "text-gray-500"
+                        }`}
+                      >
+                        {formatDate(video?.updatedAt)}
+                      </p>
                     </div>
-                    <p
-                      className={`text-xs mt-2 ${
-                        theme === "dark" ? "text-gray-500" : "text-gray-500"
-                      }`}
-                    >
-                      {formatDate(video?.updatedAt)}
-                    </p>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                <p className="text-sm sm:text-base">No videos available</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
