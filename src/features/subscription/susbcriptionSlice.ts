@@ -7,8 +7,6 @@ import {
   getChannelVideos,
 } from "./subscriptionThunks";
 import type { User } from "@/types/global";
-import { get } from "react-hook-form";
-import { getAllVideos } from "../video/videoThunks";
 
 export interface SubscriptionState {
   subscribedChannels:
@@ -135,6 +133,7 @@ export const subscriptionSlice = createSlice({
     builder.addCase(getChannelVideos.fulfilled, (state, action) => {
       state.loading = false;
       state.allVideos = action.payload.videos;
+      console.log(action.payload.videos,"videos from slice");
     });
     builder.addCase(getChannelVideos.rejected, (state, action) => {
       state.loading = false;

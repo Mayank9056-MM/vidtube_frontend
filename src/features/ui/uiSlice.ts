@@ -5,7 +5,7 @@ interface UiState {
 }
 
 const initialState: UiState = {
-  isSidebarOpen: true,
+  isSidebarOpen: false,
 };
 
 export const uiReducer = createSlice({
