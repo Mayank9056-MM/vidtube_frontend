@@ -7,6 +7,7 @@ import {
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatDuration, formatNumber } from "@/utls/helpers";
+import { set } from "react-hook-form";
 
 const Icon = ({ name, className = "w-5 h-5" }) => {
   const icons = {
@@ -201,7 +202,7 @@ export default function ChannelPage() {
   console.log("allVideos -> ", allVideos);
   console.log("onSelectedChannel -> ", onSelectedChannel);
   console.log(totalLikes);
-  console.log(videos, "videos");
+  console.log(videos, "videos in channel page");
 
   const dispatch = useAppDispatch();
 
@@ -220,34 +221,29 @@ export default function ChannelPage() {
   }, [dispatch, username]);
 
   useEffect(() => {
-    const fetchAllVideos = async () => {
-      try {
-        await dispatch(getChannelVideos(username));
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchAllVideos();
+    dispatch(getChannelVideos(username));
   }, [dispatch, username]);
 
+  // When Redux updates → update local videos
   useEffect(() => {
-    // const sortedVideos = allVideos?.sort((a, b) => {
-    //   if (sortOrder === "latest") {
-    //     return b.uploadDate.getTime() - a.uploadDate.getTime();
-    //   } else {
-    //     return a.uploadDate.getTime() - b.uploadDate.getTime();
-    //   }
-    // });
-    setVideos(allVideos);
+    if (allVideos?.length > 0) {
+      setVideos(allVideos);
+    }
+  }, [allVideos]);
+
+  useEffect(() => {
+    const sorted = [...videos].sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+
+      return sortOrder === "latest" ? dateB - dateA : dateA - dateB;
+    });
+    setVideos(sorted);
   }, [sortOrder]);
 
   const toggleSubscription = () => {
     setChannel((prev) => ({ ...prev, isSubscribed: !prev.isSubscribed }));
   };
-
-  // const toggleTheme = () => {
-  //   setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  // };
 
   return (
     <div
