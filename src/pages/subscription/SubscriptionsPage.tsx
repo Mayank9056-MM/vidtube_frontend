@@ -60,10 +60,9 @@ export default function SubscriptionsPage() {
     // Your unsubscribe logic here
     console.log("Unsubscribe from:", channelId);
   };
-
-  const filteredChannels = subscribedChannels.filter((sub) =>
-    sub?.channel?.username?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  console.log(subscribedChannels, "subscribedChannels");
+  const filteredChannels = subscribedChannels
+  console.log(filteredChannels,"filter channerl . length")
 
   return (
     <div className={theme === "dark" ? "dark" : ""}>
@@ -122,13 +121,14 @@ export default function SubscriptionsPage() {
             >
               {filteredChannels.map((sub) => (
                 <Card
-                  key={sub._id}
-                  onMouseEnter={() => setHoveredChannel(sub._id)}
-                  onMouseLeave={() => setHoveredChannel(null)}
-                  onClick={() => navigate(`/channel/${sub.channel.username}`)}
-                  className="group overflow-hidden border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02] relative"
+                key={sub._id}
+                onMouseEnter={() => setHoveredChannel(sub._id)}
+                onMouseLeave={() => setHoveredChannel(null)}
+                onClick={() => navigate(`/channel/${sub.channel.username}`)}
+                className="group overflow-hidden border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02] relative"
                 >
                   {/* Cover Image */}
+                  
                   <div
                     className="h-24 relative overflow-hidden"
                     style={{
@@ -187,11 +187,11 @@ export default function SubscriptionsPage() {
                         className="w-14 h-14 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-xl border-3 border-white dark:border-slate-900 flex-shrink-0 overflow-hidden ring-2 ring-purple-500/20"
                         style={{
                           background:
-                            sub.channel.coverImage ||
+                            sub?.channel?.coverImage ||
                             "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                         }}
                       >
-                        {sub.channel.avatar ? (
+                        {sub?.channel?.avatar ? (
                           <img
                             src={sub.channel.avatar}
                             alt={sub.channel.username}
