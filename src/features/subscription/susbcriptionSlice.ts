@@ -5,6 +5,7 @@ import {
   getChannelSubscribers,
   getChannelStats,
   getChannelVideos,
+  getSubscriptionStatus,
 } from "./subscriptionThunks";
 import type { User } from "@/types/global";
 
@@ -74,7 +75,7 @@ export const subscriptionSlice = createSlice({
     });
     builder.addCase(toggleSubscription.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload.message as string;
+      state.error = action.payload as string;
     });
 
     // Get Subscribed Channels
@@ -86,7 +87,7 @@ export const subscriptionSlice = createSlice({
       state.loading = false;
       console.log("actin.payload -> ", action.payload);
       state.subscribedChannels = action.payload.channels || [];
-      state.totalSubscribers = action.payload.totalSubs || [];
+      state.totalSubscribers = action.payload.totalSubs;
       console.log(state.subscribedChannels, "channel subscribed");
     });
     builder.addCase(getSubscribedChannels.rejected, (state, action) => {
@@ -139,6 +140,22 @@ export const subscriptionSlice = createSlice({
       console.log(action.payload.videos, "videos from slice");
     });
     builder.addCase(getChannelVideos.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
+
+    builder.addCase(getSubscriptionStatus.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addCase(getSubscriptionStatus.fulfilled, (state, action) => {
+      state.loading = false;
+      state.isSubscribed = action.payload.isSubscribed;
+      state.totalSubscribers = action.payload.totalSubscribers;
+    });
+
+    builder.addCase(getSubscriptionStatus.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
     });

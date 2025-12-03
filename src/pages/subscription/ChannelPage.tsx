@@ -3,6 +3,8 @@ import type { RootState } from "@/app/store";
 import {
   getChannelStats,
   getChannelVideos,
+  getSubscriptionStatus,
+  toggleSubscription,
 } from "@/features/subscription/subscriptionThunks";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -197,6 +199,8 @@ export default function ChannelPage() {
     totalVideos,
   } = useAppSelector((state: RootState) => state.subscription);
 
+  const { user } = useAppSelector((state: RootState) => state.user);
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -211,6 +215,12 @@ export default function ChannelPage() {
 
     fetchChannelStats();
   }, [dispatch, username]);
+
+  useEffect(() => {
+    if (username && user?._id) {
+      dispatch(getSubscriptionStatus({ username, subscriberId: user._id }));
+    }
+  }, [username, user]);
 
   useEffect(() => {
     dispatch(getChannelVideos(username));
@@ -231,8 +241,15 @@ export default function ChannelPage() {
     setVideos(sorted);
   }, [sortOrder]);
 
-  const toggleSubscription = () => {
-    // Handle subscription toggle
+  const toggleSubscriptionHandler = () => {
+    dispatch(toggleSubscription(onSelectedChannel?._id || "")).then(() => {
+      dispatch(
+        getSubscriptionStatus({
+          username: onSelectedChannel?.username || "",
+          subscriberId: user?._id || "",
+        })
+      );
+    });
   };
 
   return (
@@ -251,8 +268,13 @@ export default function ChannelPage() {
               : "text-gray-600 hover:text-black"
           } transition-colors group`}
         >
-          <Icon name="arrowLeft" className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-xs sm:text-sm font-medium">Back to channels</span>
+          <Icon
+            name="arrowLeft"
+            className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform"
+          />
+          <span className="text-xs sm:text-sm font-medium">
+            Back to channels
+          </span>
         </button>
 
         {/* Channel Header Card */}
@@ -270,7 +292,7 @@ export default function ChannelPage() {
               backgroundPosition: "center",
             }}
           />
-          
+
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
 
@@ -323,20 +345,21 @@ export default function ChannelPage() {
 
                       {/* Description */}
                       <p className="text-xs sm:text-sm md:text-base max-w-2xl line-clamp-2 text-gray-200">
-                        {onSelectedChannel?.description || "No description available"}
+                        {onSelectedChannel?.description ||
+                          "No description available"}
                       </p>
                     </div>
 
                     {/* Subscribe Button */}
                     <button
-                      onClick={toggleSubscription}
+                      onClick={toggleSubscriptionHandler}
                       className={`w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap ${
-                        onSelectedChannel?.isSubscribed
+                        isSubscribed
                           ? "bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border border-white/30"
                           : "bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-500/50"
                       }`}
                     >
-                      {onSelectedChannel?.isSubscribed ? (
+                      {isSubscribed ? (
                         <>
                           <Icon name="bell" className="w-4 h-4" />
                           Subscribed
@@ -366,7 +389,10 @@ export default function ChannelPage() {
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <Icon name="video" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                <Icon
+                  name="video"
+                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white"
+                />
               </div>
             </div>
             <p
@@ -393,7 +419,10 @@ export default function ChannelPage() {
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                <Icon name="eye" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                <Icon
+                  name="eye"
+                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white"
+                />
               </div>
             </div>
             <p
@@ -420,7 +449,10 @@ export default function ChannelPage() {
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center shadow-lg shadow-rose-500/30">
-                <Icon name="heart" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                <Icon
+                  name="heart"
+                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white"
+                />
               </div>
             </div>
             <p
@@ -447,7 +479,10 @@ export default function ChannelPage() {
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <Icon name="calendar" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                <Icon
+                  name="calendar"
+                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white"
+                />
               </div>
             </div>
             <p
@@ -524,7 +559,9 @@ export default function ChannelPage() {
                     className={`group rounded-lg sm:rounded-xl overflow-hidden ${
                       theme === "dark" ? "bg-gray-800/50" : "bg-white"
                     } border ${
-                      theme === "dark" ? "border-gray-700/50" : "border-gray-200"
+                      theme === "dark"
+                        ? "border-gray-700/50"
+                        : "border-gray-200"
                     } hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer`}
                   >
                     {/* Thumbnail */}
@@ -539,7 +576,10 @@ export default function ChannelPage() {
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-red-600 flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
-                          <Icon name="play" className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white ml-1" />
+                          <Icon
+                            name="play"
+                            className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white ml-1"
+                          />
                         </div>
                       </div>
                       <div className="absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-black/90 text-white text-[10px] sm:text-xs font-semibold rounded">
@@ -584,7 +624,11 @@ export default function ChannelPage() {
                 ))}
               </div>
             ) : (
-              <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+              <div
+                className={`text-center py-12 ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
                 <p className="text-sm sm:text-base">No videos available</p>
               </div>
             )}

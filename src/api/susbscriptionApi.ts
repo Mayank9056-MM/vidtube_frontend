@@ -7,7 +7,9 @@ import axiosInstance from "./axiosInstance";
  * @returns {Promise<object>} - The response from the API
  * @throws {Error} - If the API call fails
  */
-export const toggleSubscriptionApi = async (channelId: string): Promise<object> => {
+export const toggleSubscriptionApi = async (
+  channelId: string
+): Promise<object> => {
   try {
     const res = await axiosInstance.patch(
       `/api/v1/subscriptions/toggle-sub/${channelId}`
@@ -24,7 +26,9 @@ export const toggleSubscriptionApi = async (channelId: string): Promise<object> 
  * @param {string} subscriberId - The id of the user
  * @returns {Promise<object[]>} - An array of subscribed channels
  */
-export const getSubscribedChannelsApi = async (subscriberId: string): Promise<object[]> => {
+export const getSubscribedChannelsApi = async (
+  subscriberId: string
+): Promise<object[]> => {
   try {
     const res = await axiosInstance.get(
       `/api/v1/subscriptions/subscribed-channels/${subscriberId}`
@@ -42,7 +46,9 @@ export const getSubscribedChannelsApi = async (subscriberId: string): Promise<ob
  * @param {string} channelId - The id of the channel
  * @returns {Promise<object[]>} - An array of subscribed users
  */
-export const getChannelSubscribersApi = async (channelId: string): Promise<object[]> => {
+export const getChannelSubscribersApi = async (
+  channelId: string
+): Promise<object[]> => {
   try {
     const res = await axiosInstance.get(
       `api/v1/subscriptions/subscribers/${channelId}`
@@ -61,7 +67,7 @@ export const getChannelSubscribersApi = async (channelId: string): Promise<objec
  * @returns {Promise<object>} - The channel stats
  * @throws {Error} - If the API call fails
  */
-export const getChannelStatsApi = async(username: string): Promise<object> => {
+export const getChannelStatsApi = async (username: string): Promise<object> => {
   try {
     const res = await axiosInstance.get(
       `/api/v1/dashboards/channel-stats/${username}`
@@ -72,7 +78,7 @@ export const getChannelStatsApi = async(username: string): Promise<object> => {
     console.log(error);
     throw error;
   }
-}
+};
 
 /**
  * Get all videos for a given channel
@@ -80,15 +86,38 @@ export const getChannelStatsApi = async(username: string): Promise<object> => {
  * @returns {Promise<object[]>} - An array of videos for the given channel
  * @throws {Error} - If the API call fails
  */
-export const getChannelVideosApi = async(username: string): Promise<object[]> => {
+export const getChannelVideosApi = async (
+  username: string
+): Promise<object[]> => {
   try {
-    console.log("hiii i am runinng............")
     const res = await axiosInstance.get(
-      `/api/v1/dashboards/channel-videos/${username}`)
-      logger.info("get channelvideo api res", res);
+      `/api/v1/dashboards/channel-videos/${username}`
+    );
+    logger.info("get channelvideo api res", res);
     return res.data.data;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     throw error;
   }
-}
+};
+
+export const getSubscriptionStatusApi = async (
+  username: string,
+  subscriberId: string
+) => {
+  try {
+    const res = await axiosInstance.get(
+      `/api/v1/subscriptions/status/${username}`,
+      {
+        params: {
+          subscriber: subscriberId,
+        },
+      }
+    );
+    logger.info("get channelvideo api res", res);
+    return res.data.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
