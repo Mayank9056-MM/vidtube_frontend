@@ -85,7 +85,8 @@ export const subscriptionSlice = createSlice({
     builder.addCase(getSubscribedChannels.fulfilled, (state, action) => {
       state.loading = false;
       console.log("actin.payload -> ", action.payload);
-      state.subscribedChannels = action.payload || [];
+      state.subscribedChannels = action.payload.channels || [];
+      state.totalSubscribers = action.payload.totalSubs || [];
       console.log(state.subscribedChannels, "channel subscribed");
     });
     builder.addCase(getSubscribedChannels.rejected, (state, action) => {
@@ -100,6 +101,7 @@ export const subscriptionSlice = createSlice({
     });
     builder.addCase(getChannelSubscribers.fulfilled, (state, action) => {
       state.loading = false;
+      console.log(action.payload, "get channel subscribers");
       state.channelSubscribers = action.payload || [];
       state.totalSubscribers = action.payload.length;
     });
@@ -116,6 +118,7 @@ export const subscriptionSlice = createSlice({
     builder.addCase(getChannelStats.fulfilled, (state, action) => {
       state.loading = false;
       state.totalVideos = action.payload.totalVideos;
+      state.totalSubscribers = action.payload.totalSubs;
       state.totalViews = action.payload.totalViews;
       state.totalLikes = action.payload.totalLikes;
       state.onSelectedChannel = action.payload.user;
@@ -133,7 +136,7 @@ export const subscriptionSlice = createSlice({
     builder.addCase(getChannelVideos.fulfilled, (state, action) => {
       state.loading = false;
       state.allVideos = action.payload.videos;
-      console.log(action.payload.videos,"videos from slice");
+      console.log(action.payload.videos, "videos from slice");
     });
     builder.addCase(getChannelVideos.rejected, (state, action) => {
       state.loading = false;
