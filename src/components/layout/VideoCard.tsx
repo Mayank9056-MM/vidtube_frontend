@@ -11,8 +11,9 @@ interface VideoCardProps {
     title: string;
     channel: string;
     views: string;
-    time: string;
+    uploadedAt: string;
     duration: string;
+    verified: boolean;
   };
 }
 
@@ -70,7 +71,7 @@ export const VideoCard = ({ video }: VideoCardProps) => {
             <span>•</span>
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {video.time}
+              {video.uploadedAt}
             </span>
           </div>
         </div>
