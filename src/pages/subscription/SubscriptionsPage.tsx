@@ -25,8 +25,10 @@ export default function SubscriptionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [hoveredChannel, setHoveredChannel] = useState(null);
-  const [unsubscribingChannels, setUnsubscribingChannels] = useState<Set<string>>(new Set());
-  
+  const [unsubscribingChannels, setUnsubscribingChannels] = useState<
+    Set<string>
+  >(new Set());
+
   const { user } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   const subscribedChannels = useAppSelector(
@@ -45,7 +47,7 @@ export default function SubscriptionsPage() {
     };
 
     getSubscribers();
-  }, [dispatch, user]);
+  }, [dispatch, user?._id]);
 
   const toggleNotifications = (channelId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -55,24 +57,25 @@ export default function SubscriptionsPage() {
 
   const toggleSubscriptionHandler = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    
+
     if (!id || !user?._id) return;
-    
+
     try {
       // Add to unsubscribing set to prevent double clicks
-      setUnsubscribingChannels(prev => new Set(prev).add(id));
-      
+      setUnsubscribingChannels((prev) => new Set(prev).add(id));
+
       // Toggle subscription
       await dispatch(toggleSubscription(id)).unwrap();
-      
+
       // Refresh the subscribed channels list
+      console.log("before refreshing => ", subscribedChannels);
       await dispatch(getSubscribedChannels(user._id)).unwrap();
-      
+      console.log("after refreshing => ", subscribedChannels);
     } catch (error) {
       console.error("Error unsubscribing:", error);
     } finally {
       // Remove from unsubscribing set
-      setUnsubscribingChannels(prev => {
+      setUnsubscribingChannels((prev) => {
         const newSet = new Set(prev);
         newSet.delete(id);
         return newSet;
@@ -80,9 +83,11 @@ export default function SubscriptionsPage() {
     }
   };
 
-  const filteredChannels = subscribedChannels.filter((sub) =>
-    sub?.channel?.username?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredChannels = subscribedChannels
+    .filter((sub) => sub?.channel !== null)
+    .filter((sub) =>
+      sub?.channel?.username?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   return (
     <div className={theme === "dark" ? "dark" : ""}>
@@ -195,7 +200,9 @@ export default function SubscriptionsPage() {
                         className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white border-0 shadow-lg rounded-lg px-3 py-1 text-xs font-medium backdrop-blur-md disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <UserMinus className="w-3 h-3 mr-1" />
-                        {unsubscribingChannels.has(sub._id) ? "Unsubscribing..." : "Unsubscribe"}
+                        {unsubscribingChannels.has(sub._id)
+                          ? "Unsubscribing..."
+                          : "Unsubscribe"}
                       </Button>
                     </div>
                   </div>
