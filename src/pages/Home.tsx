@@ -5,6 +5,7 @@ import { CheckCircle, MoreVertical, Loader2 } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { VideoCard } from "@/components/layout/VideoCard";
 import { getAllVideos } from "@/features/video/videoThunks";
+import {formatDate,formatDuration,formatNumber} from "@/utls/helpers"
 
 // Assuming you have this thunk in your video slice
 // import { fetchAllVideos } from "@/features/video/videoThunks";
@@ -72,47 +73,6 @@ export default function Home() {
       return `${(views / 1000).toFixed(1)}K`;
     }
     return views.toString();
-  };
-
-  // Helper function to format date
-  const formatDate = (date: string) => {
-    const now = new Date();
-    const videoDate = new Date(date);
-    const diffMs = now.getTime() - videoDate.getTime();
-
-    const diffMinutes = diffMs / (1000 * 60);
-    const diffHours = diffMs / (1000 * 60 * 60);
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffMinutes < 1) return "Just now";
-    if (diffMinutes < 60) return `${Math.floor(diffMinutes)} minutes ago`;
-    if (diffHours < 24) return `${Math.floor(diffHours)} hours ago`;
-    if (diffDays === 0) return "Today";
-    if (diffDays === 1) return "Yesterday";
-    if (diffDays < 7) return `${diffDays} days ago`;
-
-    const diffWeeks = Math.floor(diffDays / 7);
-    if (diffWeeks < 4) return `${diffWeeks} weeks ago`;
-
-    const diffMonths = Math.floor(diffDays / 30);
-    if (diffMonths < 12) return `${diffMonths} months ago`;
-
-    const diffYears = Math.floor(diffMonths / 12);
-    return `${diffYears} years ago`;
-  };
-
-  // Helper function to format duration
-  const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, "0")}:${secs
-        .toString()
-        .padStart(2, "0")}`;
-    }
-    return `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
