@@ -141,7 +141,7 @@ export default function Home() {
                       video.owner?.avatar ||
                       `https://ui-avatars.com/api/?name=${video.owner?.username}&background=ef4444&color=fff`,
                     views: formatViews(video.views || 0),
-                    uploadedAt: formatDate(video.createdAt),
+                    uploadedAt: formatDate(video.createdAt || new Date()),
                     duration: formatDuration(video.duration || 0),
                     verified: video.owner?.isVerified || false,
                   }}
