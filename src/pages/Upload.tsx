@@ -111,7 +111,10 @@ export default function UploadPage() {
       setUploadSuccess(true);
 
       setTimeout(() => {
-        reset();
+        reset({
+          title: "",
+          description: "",
+        });
         removeVideo();
         removeThumbnail();
         setUploadSuccess(false);
@@ -119,7 +122,6 @@ export default function UploadPage() {
       }, 2000);
     }, 3000);
 
-   
     const formData: PublishVideoData = {
       video: videoFile,
       thumbnail: thumbnailFile,

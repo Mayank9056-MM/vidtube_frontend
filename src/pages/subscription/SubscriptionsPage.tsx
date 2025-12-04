@@ -6,16 +6,17 @@ import {
   Bell,
   BellOff,
   Search,
-  Eye,
   List,
   CheckCircle,
-  Video,
   Grid3x3,
   UserMinus,
   UserPlus,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { getSubscribedChannels } from "@/features/subscription/subscriptionThunks";
+import {
+  getSubscribedChannels,
+  toggleSubscription,
+} from "@/features/subscription/subscriptionThunks";
 import type { RootState } from "@/app/store";
 import { useNavigate } from "react-router-dom";
 
@@ -24,6 +25,10 @@ export default function SubscriptionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [hoveredChannel, setHoveredChannel] = useState(null);
+  const [unsubscribingChannels, setUnsubscribingChannels] = useState<
+    Set<string>
+  >(new Set());
+
   const { user } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   const subscribedChannels = useAppSelector(
@@ -32,37 +37,57 @@ export default function SubscriptionsPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getSubscibers = async () => {
+    const getSubscribers = async () => {
       try {
-        await dispatch(getSubscribedChannels(user?._id));
+        if (!user?._id) return;
+        await dispatch(getSubscribedChannels(user._id));
       } catch (error) {
         console.log(error);
       }
     };
 
-    getSubscibers();
-  }, [dispatch, user]);
+    getSubscribers();
+  }, [dispatch, user?._id]);
 
-  const toggleNotifications = (channelId, e) => {
+  const toggleNotifications = (channelId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     // Your notification toggle logic here
     console.log("Toggle notifications for:", channelId);
   };
 
-  const handleSubscribe = (channelId, e) => {
+  const toggleSubscriptionHandler = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    // Your subscribe logic here
-    console.log("Subscribe to:", channelId);
+
+    if (!id || !user?._id) return;
+
+    try {
+      // Add to unsubscribing set to prevent double clicks
+      setUnsubscribingChannels((prev) => new Set(prev).add(id));
+
+      // Toggle subscription
+      await dispatch(toggleSubscription(id)).unwrap();
+
+      // Refresh the subscribed channels list
+      console.log("before refreshing => ", subscribedChannels);
+      await dispatch(getSubscribedChannels(user._id)).unwrap();
+      console.log("after refreshing => ", subscribedChannels);
+    } catch (error) {
+      console.error("Error unsubscribing:", error);
+    } finally {
+      // Remove from unsubscribing set
+      setUnsubscribingChannels((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
   };
 
-  const handleUnsubscribe = (channelId, e) => {
-    e.stopPropagation();
-    // Your unsubscribe logic here
-    console.log("Unsubscribe from:", channelId);
-  };
-  console.log(subscribedChannels, "subscribedChannels");
   const filteredChannels = subscribedChannels
-  console.log(filteredChannels,"filter channerl . length")
+    .filter((sub) => sub?.channel !== null)
+    .filter((sub) =>
+      sub?.channel?.username?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   return (
     <div className={theme === "dark" ? "dark" : ""}>
@@ -121,14 +146,13 @@ export default function SubscriptionsPage() {
             >
               {filteredChannels.map((sub) => (
                 <Card
-                key={sub._id}
-                onMouseEnter={() => setHoveredChannel(sub._id)}
-                onMouseLeave={() => setHoveredChannel(null)}
-                onClick={() => navigate(`/channel/${sub.channel.username}`)}
-                className="group overflow-hidden border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02] relative"
+                  key={sub._id}
+                  onMouseEnter={() => setHoveredChannel(sub._id)}
+                  onMouseLeave={() => setHoveredChannel(null)}
+                  onClick={() => navigate(`/channel/${sub.channel.username}`)}
+                  className="group overflow-hidden border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02] relative"
                 >
                   {/* Cover Image */}
-                  
                   <div
                     className="h-24 relative overflow-hidden"
                     style={{
@@ -170,12 +194,15 @@ export default function SubscriptionsPage() {
                       }`}
                     >
                       <Button
-                        onClick={(e) => handleUnsubscribe(sub._id, e)}
+                        onClick={(e) => toggleSubscriptionHandler(e, sub?._id)}
+                        disabled={unsubscribingChannels.has(sub._id)}
                         size="sm"
-                        className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white border-0 shadow-lg rounded-lg px-3 py-1 text-xs font-medium backdrop-blur-md"
+                        className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white border-0 shadow-lg rounded-lg px-3 py-1 text-xs font-medium backdrop-blur-md disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <UserMinus className="w-3 h-3 mr-1" />
-                        Unsubscribe
+                        {unsubscribingChannels.has(sub._id)
+                          ? "Unsubscribing..."
+                          : "Unsubscribe"}
                       </Button>
                     </div>
                   </div>
@@ -199,7 +226,7 @@ export default function SubscriptionsPage() {
                           />
                         ) : (
                           <span>
-                            {sub.channel.username?.charAt(0).toUpperCase()}
+                            {sub?.channel?.username?.charAt(0).toUpperCase()}
                           </span>
                         )}
                       </div>
@@ -218,17 +245,6 @@ export default function SubscriptionsPage() {
                         <p className="text-xs text-slate-600 dark:text-slate-400 mb-2 font-medium">
                           {sub?.subscribers || 0} subscribers
                         </p>
-
-                        {/* <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-500">
-                          <span className="flex items-center gap-1 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                            <Video className="w-3 h-3" />
-                            {sub?.totalVideos || 0}
-                          </span>
-                          <span className="flex items-center gap-1 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                            <Eye className="w-3 h-3" />
-                            {sub?.totalViews || 0}
-                          </span>
-                        </div> */}
                       </div>
                     </div>
                   </CardContent>

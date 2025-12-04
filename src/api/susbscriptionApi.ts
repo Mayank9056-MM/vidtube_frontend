@@ -30,6 +30,7 @@ export const getSubscribedChannelsApi = async (
   subscriberId: string
 ): Promise<object[]> => {
   try {
+    console.log(subscriberId,"subscriberId8888888888888888888");
     const res = await axiosInstance.get(
       `/api/v1/subscriptions/subscribed-channels/${subscriberId}`
     );
