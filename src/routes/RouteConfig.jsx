@@ -6,6 +6,8 @@ import VideoPage from "@/pages/video/VideoPage";
 import TweetPage from "@/pages/tweet/TweetPage";
 import SubscriptionPage from "@/pages/subscription/SubscriptionsPage";
 import ChannelPage from "@/pages/subscription/ChannelPage";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import ResetPassword from "@/pages/auth/ResetPassword";
 
 export const publicRoutes = [
   {
@@ -15,6 +17,14 @@ export const publicRoutes = [
   {
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
 ];
 
@@ -37,10 +47,10 @@ export const privateRoutes = [
   },
   {
     path: "/subscriptions",
-    element: <SubscriptionPage />
+    element: <SubscriptionPage />,
   },
   {
     path: "/channel/:username",
-    element: <ChannelPage />
-  }
+    element: <ChannelPage />,
+  },
 ];

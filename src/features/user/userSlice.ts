@@ -9,6 +9,9 @@ import {
   getWatchHistory,
   LogoutUser,
   refreshAccessToken,
+  changePasswordUser,
+  resetPasswordUser,
+  forgotPasswordUser,
 } from "./userThunks";
 import type { User } from "@/types/global";
 import { logger } from "@/utls/logger";
@@ -191,6 +194,53 @@ const userSlice = createSlice({
       })
       .addCase(refreshAccessToken.rejected, (state) => {
         state.tokenRefreshing = false;
+      });
+
+    // --- FORGOT PASSWORD ---
+    builder
+      .addCase(forgotPasswordUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(forgotPasswordUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage =
+          action.payload?.message || "Password reset email sent";
+      })
+      .addCase(forgotPasswordUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // --- RESET PASSWORD ---
+    builder
+      .addCase(resetPasswordUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(resetPasswordUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Password reset successfully";
+      })
+      .addCase(resetPasswordUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // --- CHANGE USER PASSWORD ---
+    builder
+      .addCase(changePasswordUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(changePasswordUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Password changed successfully";
+      })
+      .addCase(changePasswordUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });
