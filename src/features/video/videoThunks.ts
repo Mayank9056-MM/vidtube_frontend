@@ -6,6 +6,7 @@ import {
   updateVideoApi,
   togglePublishStatusApi,
   getAllVideosApi,
+  addViewApi,
 } from "@/api/videoApi";
 import type { publishVideoData, updateVideoData } from "@/api/videoApi.types";
 import { logger } from "@/utls/logger";
@@ -91,3 +92,15 @@ export const togglePublishStatus = createAsyncThunk(
     }
   }
 );
+
+export const addView = createAsyncThunk(
+  "videos/addView",
+  async (videoId: string, { rejectWithValue }) => {
+    try {
+      const res = await addViewApi(videoId);
+      return res;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to add view");
+    }
+  }
+)

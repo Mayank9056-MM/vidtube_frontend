@@ -97,3 +97,14 @@ export const getAllVideosApi = async () => {
     return error.message;
   }
 };
+
+export const addViewApi = async (videoId: string ) => {
+  try {
+    const res = await axiosInstance.post(`/api/v1/videos/add-view/${videoId}`);
+    logger.info("res from add view api => ", res);
+    return res.data;
+  } catch (error) {
+    console.log(error)
+    throw error;
+  }
+}

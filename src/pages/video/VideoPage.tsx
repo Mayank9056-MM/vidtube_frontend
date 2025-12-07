@@ -20,7 +20,7 @@ import {
 import { useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import type { RootState } from "@/app/store";
-import { getVideoById } from "@/features/video/videoThunks";
+import { addView, getVideoById } from "@/features/video/videoThunks";
 import {
   getChannelSubscribers,
   getSubscribedChannels,
@@ -96,6 +96,7 @@ export default function VideoPage() {
   const [theme] = useState("light");
   const dispatch = useAppDispatch();
   const { showError, showSuccess, showInfo } = useToast();
+    const viewSent = useRef(false);
 
   const videoData = useAppSelector(
     (state: RootState) => state.video.selectedVideo
@@ -189,9 +190,38 @@ export default function VideoPage() {
   }, [videoData]);
 
   useEffect(() => {
+    if (!videoRef.current) return;
     if (!videoId) return;
-    dispatch(getComments(videoId));
-  }, [videoId, dispatch]);
+
+  
+
+    const trackView = () => {
+      const player = videoRef.current;
+
+      if (!player) return;
+
+      if (player.currentTime >= 30 && !viewSent.current) {
+        viewSent.current = true;
+        dispatch(addView(videoId));
+      }
+    };
+
+    videoRef.current.addEventListener("timeupdate", trackView);
+
+    return () => {
+      if (videoRef.current) {
+        videoRef.current.removeEventListener("timeupdate", trackView);
+      }
+    };
+  }, [videoId]);
+
+  const sendView = async (videoId: string) => {
+    try {
+      await dispatch(addView(videoId));
+    } catch (error) {
+      console.error("Error counting view:", error);
+    }
+  };
 
   const togglePlay = () => {
     if (videoRef.current) {

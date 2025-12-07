@@ -6,6 +6,7 @@ import {
   deleteVideo,
   updateVideo,
   togglePublishStatus,
+  addView,
 } from "../video/videoThunks";
 
 export interface Video {
@@ -141,6 +142,20 @@ const videoSlice = createSlice({
       .addCase(togglePublishStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      });
+
+    builder
+      .addCase(addView.pending, (state) => {
+        // no need to set loading
+      })
+      .addCase(addView.fulfilled, (state, action) => {
+        // Update the selected video's view count locally
+        if (state.selectedVideo) {
+          state.selectedVideo.views = state.selectedVideo.views + 1;
+        }
+      })
+      .addCase(addView.rejected, (state, action) => {
+        console.log("Failed to update view:", action.payload);
       });
   },
 });
