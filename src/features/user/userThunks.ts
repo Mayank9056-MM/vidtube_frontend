@@ -2,18 +2,23 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   currentUserApi,
+  forgotPasswordUserApi,
   getUserWatchHistoryApi,
   loginUserApi,
   logoutUserApi,
   refreshAccessTokenApi,
   registerUserApi,
+  resetPasswordUserApi,
   updateAccountUserApi,
   updateAvatarUserApi,
+  changeUserPasswordApi,
 } from "../../api/userApi";
 
 import type {
+  ChangePasswordData,
   LoginUserData,
   RegisterUserData,
+  resetPasswordData,
   UpdateAccountData,
   UpdateAvatarData,
 } from "../../api/userApi.types";
@@ -50,7 +55,7 @@ export const loginUser = createAsyncThunk<
       ? { email: data.emailOrUsername, password: data.password }
       : { username: data.emailOrUsername, password: data.password };
     const res = await loginUserApi(payload);
-    logger.info("resposne from login thunks => ",res)
+    logger.info("resposne from login thunks => ", res);
     return res;
   } catch (error: any) {
     return rejectWithValue(
@@ -137,6 +142,45 @@ export const getWatchHistory = createAsyncThunk(
     try {
       const res = await getUserWatchHistoryApi();
       logger.info("get watch history user from user thunks", res);
+      return res;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const forgotPasswordUser = createAsyncThunk(
+  "user/forgotPassword",
+  async (email: string, { rejectWithValue }) => {
+    try {
+      const res = await forgotPasswordUserApi(email);
+      logger.info("forgot password user from user thunks", res);
+      return res;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const resetPasswordUser = createAsyncThunk(
+  "user/resetPassword",
+  async ({ token, data: resetPasswordData }, { rejectWithValue }) => {
+    try {
+      const res = await resetPasswordUserApi(token, data);
+      logger.info("reset password user from user thunks", res);
+      return res;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const changePasswordUser = createAsyncThunk(
+  "user/changePassword",
+  async (data: ChangePasswordData, { rejectWithValue }) => {
+    try {
+      const res = await changeUserPasswordApi(data);
+      logger.info("change password user from user thunks", res);
       return res;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);

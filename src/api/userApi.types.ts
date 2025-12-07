@@ -29,3 +29,12 @@ export interface UpdateAvatarData {
 export interface UpdateThumbnailData {
   coverImage: File;
 }
+
+export interface ChangePasswordData {
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface resetPasswordData {
+  password: string;
+}

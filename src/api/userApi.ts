@@ -4,6 +4,7 @@ import type {
   ChangePasswordData,
   LoginUserData,
   RegisterUserData,
+  resetPasswordData,
   UpdateAccountData,
   UpdateAvatarData,
   UpdateThumbnailData,
@@ -201,5 +202,63 @@ export const getUserWatchHistoryApi = async () => {
   } catch (error: any) {
     logger.warn("error in get user watch history api", error);
     throw error.message;
+  }
+};
+
+/**
+ * Forgot password api
+ * This api is used to send a forgot password email to the user.
+ * The email will contain a link to reset the password.
+ *
+ * @param {string} email - The email address of the user
+ * @returns {Promise<string>} - A success message or error message
+ */
+export const forgotPasswordUserApi = async (email: string): Promise<string> => {
+  try {
+    const res = await axiosInstance.post("/api/v1/users/forgot-password", {
+      email,
+    });
+    logger.info("res from forgot password user api => ", res);
+    return res.data;
+  } catch (error: any) {
+    console.log(error);
+    throw error;
+  }
+};
+
+/**
+ * Resets a user's password given a valid reset password token.
+ * The token is obtained from the forgot password email sent to the user.
+ *
+ * @param {string} token - The reset password token
+ * @returns {Promise<string>} - A success message or error message
+ */
+export const resetPasswordUserApi = async (
+  token: string,
+  data: resetPasswordData
+): Promise<string> => {
+  try {
+    const res = await axiosInstance.post(
+      `/api/v1/users/reset-password/:${token}`,
+      { data }
+    );
+    logger.info("res from reset password user api => ", res);
+    return res.data;
+  } catch (error: any) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const changeUserPasswordApi = async (data: ChangePasswordData) => {
+  try {
+    const res = await axiosInstance.post("/api/v1/users/change-password", {
+      data,
+    });
+    logger.info("res from change password user api => ", res);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };

@@ -96,7 +96,7 @@ export default function VideoPage() {
   const [theme] = useState("light");
   const dispatch = useAppDispatch();
   const { showError, showSuccess, showInfo } = useToast();
-    const viewSent = useRef(false);
+  const viewSent = useRef(false);
 
   const videoData = useAppSelector(
     (state: RootState) => state.video.selectedVideo
@@ -192,8 +192,6 @@ export default function VideoPage() {
   useEffect(() => {
     if (!videoRef.current) return;
     if (!videoId) return;
-
-  
 
     const trackView = () => {
       const player = videoRef.current;
