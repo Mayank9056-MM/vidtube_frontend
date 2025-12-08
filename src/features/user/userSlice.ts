@@ -24,6 +24,7 @@ interface UserState {
   tokenRefreshing: boolean;
   successMessage?: string | null;
   initialized?: boolean;
+  forgotPasswordAttempt?: boolean;
 }
 
 const getInitialTheme = (): "light" | "dark" => {
@@ -43,6 +44,7 @@ const initialState: UserState = {
   tokenRefreshing: false,
   successMessage: null,
   initialized: false,
+  forgotPasswordAttempt: false,
 };
 
 const userSlice = createSlice({
@@ -72,6 +74,9 @@ const userSlice = createSlice({
     },
     markInitialized: (state) => {
       state.initialized = true;
+    },
+    resetForgotPasswordAttempt(state) {
+      state.forgotPasswordAttempt = false;
     },
   },
   extraReducers: (builder) => {
@@ -207,6 +212,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.successMessage =
           action.payload?.message || "Password reset email sent";
+        state.forgotPasswordAttempt = true;
       })
       .addCase(forgotPasswordUser.rejected, (state, action) => {
         state.loading = false;

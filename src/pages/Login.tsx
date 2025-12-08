@@ -27,7 +27,7 @@ export default function Login() {
   const theme = useSelector((state: RootState) => state.user.theme);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { showError, showSuccess } = useToast();
+  const { showError, showSuccess,showInfo } = useToast();
   const { loading } = useSelector((state: RootState) => state.user);
 
   const {
@@ -49,6 +49,8 @@ export default function Login() {
   };
 
   const handleForgotPassword = () => {
+    navigate("/forgot-password")
+    showInfo("Navigating to forgot password page");
     console.log("Navigate to forgot password page");
   };
 

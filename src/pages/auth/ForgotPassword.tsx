@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,7 +29,17 @@ export default function ForgotPassword() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { showError, showSuccess } = useToast();
-  const { loading } = useSelector((state: RootState) => state.user);
+  const { loading,forgotPasswordAttempt } = useSelector((state: RootState) => state.user);
+
+useEffect(() => {
+  if (forgotPasswordAttempt) {
+    navigate("/reset-password");
+
+    // Reset after navigation
+    dispatch({ type: "user/resetForgotPasswordAttempt" });
+  }
+}, [forgotPasswordAttempt]);
+
 
   const {
     register,
@@ -47,6 +57,8 @@ export default function ForgotPassword() {
       showError(res?.payload || "Failed to send reset email");
     }
   };
+
+
 
   const handleBackToLogin = () => {
     navigate("/login");

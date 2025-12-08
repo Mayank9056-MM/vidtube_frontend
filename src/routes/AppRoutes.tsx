@@ -13,7 +13,11 @@ export const AppRoutes = () => {
     <Routes>
       {/* PUBLIC */}
       {publicRoutes.map((r) => (
-        <Route key={r.path} path={r.path} element={r.element} />
+        <Route
+          key={r.path}
+          path={r.path}
+          element={<PublicRoute>{r.element}</PublicRoute>}
+        />
       ))}
 
       {/* PRIVATE */}

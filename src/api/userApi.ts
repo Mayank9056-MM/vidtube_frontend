@@ -215,11 +215,12 @@ export const getUserWatchHistoryApi = async () => {
  */
 export const forgotPasswordUserApi = async (email: string): Promise<string> => {
   try {
-    const res = await axiosInstance.post("/api/v1/users/forgot-password", {
-      email,
-    });
+    const res = await axiosInstance.post(
+      "/api/v1/users/forgot-password",
+      email
+    );
     logger.info("res from forgot password user api => ", res);
-    return res.data;
+    return res.data.data;
   } catch (error: any) {
     console.log(error);
     throw error;
@@ -243,7 +244,7 @@ export const resetPasswordUserApi = async (
       { data }
     );
     logger.info("res from reset password user api => ", res);
-    return res.data;
+    return res.data.data;
   } catch (error: any) {
     console.log(error);
     throw error;
@@ -256,7 +257,7 @@ export const changeUserPasswordApi = async (data: ChangePasswordData) => {
       data,
     });
     logger.info("res from change password user api => ", res);
-    return res.data;
+    return res.data.data;
   } catch (error) {
     console.log(error);
     throw error;
