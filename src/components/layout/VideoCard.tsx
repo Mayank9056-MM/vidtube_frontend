@@ -2,10 +2,11 @@ import { useAppSelector } from "@/app/hooks";
 import type { RootState } from "@/app/store";
 import { Clock, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { formatDate, formatDuration, formatNumber } from "@/utls/helpers";
 
 interface VideoCardProps {
   video: {
-    id: number;
+    _id: number;
     thumbnail: string;
     avatar: string;
     title: string;
@@ -24,8 +25,8 @@ export const VideoCard = ({ video }: VideoCardProps) => {
   return (
     <div
       className="group cursor-pointer"
-      key={video.id}
-      onClick={() => navigate(`/watch/${video.id}`)}
+      key={video._id}
+      onClick={() => navigate(`/watch/${video._id}`)}
     >
       <div className="relative rounded-xl overflow-hidden mb-3">
         <img
@@ -34,7 +35,7 @@ export const VideoCard = ({ video }: VideoCardProps) => {
           className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute bottom-2 right-2 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded">
-          {video.duration}
+          {formatDuration(video.duration)}
         </div>
       </div>
       <div className="flex gap-3">
@@ -66,12 +67,12 @@ export const VideoCard = ({ video }: VideoCardProps) => {
           >
             <span className="flex items-center gap-1">
               <Eye className="w-3 h-3" />
-              {video.views} views
+              {formatNumber(video.views)} views
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {video.uploadedAt}
+              {formatDate(video.uploadedAt)}
             </span>
           </div>
         </div>
