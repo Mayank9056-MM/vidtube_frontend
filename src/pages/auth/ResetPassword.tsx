@@ -21,8 +21,7 @@ import { useToast } from "@/hooks/useToast";
 
 interface ResetPasswordData {
   token: string;
-  newPassword: string;
-  confirmPassword: string;
+  password: string;
 }
 
 export default function ResetPassword() {
@@ -58,19 +57,22 @@ export default function ResetPassword() {
     const res = await dispatch(
       resetPasswordUser({
         token: data.token,
-        newPassword: data.newPassword,
+        password: data.newPassword,
       })
     );
 
     if (resetPasswordUser.fulfilled.match(res)) {
       showSuccess("Password reset successfully! 🎉");
       setResetSuccess(true);
-      // Redirect to login after 3 seconds
+
       setTimeout(() => {
         navigate("/login");
       }, 3000);
     } else {
-      showError(res?.payload || "Failed to reset password. Invalid or expired token.");
+      console.log(res);
+      showError(
+        res.payload || "Failed to reset password. Invalid or expired token."
+      );
     }
   };
 
@@ -81,7 +83,7 @@ export default function ResetPassword() {
   // Password strength checker
   const getPasswordStrength = (password: string) => {
     if (!password) return { strength: 0, label: "", color: "" };
-    
+
     let strength = 0;
     if (password.length >= 8) strength++;
     if (password.length >= 12) strength++;
@@ -89,9 +91,23 @@ export default function ResetPassword() {
     if (/\d/.test(password)) strength++;
     if (/[^a-zA-Z0-9]/.test(password)) strength++;
 
-    if (strength <= 2) return { strength, label: "Weak", color: "text-red-600 dark:text-red-400" };
-    if (strength <= 3) return { strength, label: "Medium", color: "text-yellow-600 dark:text-yellow-400" };
-    return { strength, label: "Strong", color: "text-green-600 dark:text-green-400" };
+    if (strength <= 2)
+      return {
+        strength,
+        label: "Weak",
+        color: "text-red-600 dark:text-red-400",
+      };
+    if (strength <= 3)
+      return {
+        strength,
+        label: "Medium",
+        color: "text-yellow-600 dark:text-yellow-400",
+      };
+    return {
+      strength,
+      label: "Strong",
+      color: "text-green-600 dark:text-green-400",
+    };
   };
 
   const passwordStrength = getPasswordStrength(newPassword || "");
@@ -280,7 +296,8 @@ export default function ResetPassword() {
                             },
                             pattern: {
                               value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                              message: "Password must include uppercase, lowercase, and number",
+                              message:
+                                "Password must include uppercase, lowercase, and number",
                             },
                           })}
                           className={`bg-gray-50 dark:bg-gray-950 border-gray-300 dark:border-gray-700 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-500 pr-10 sm:pr-12 transition-all h-10 sm:h-11 text-sm sm:text-base ${
@@ -306,7 +323,7 @@ export default function ResetPassword() {
                           {errors.newPassword.message}
                         </p>
                       )}
-                      
+
                       {/* Password Strength Indicator */}
                       {newPassword && (
                         <div className="space-y-2">
@@ -314,7 +331,9 @@ export default function ResetPassword() {
                             <span className="text-xs text-gray-600 dark:text-gray-400">
                               Password Strength:
                             </span>
-                            <span className={`text-xs font-semibold ${passwordStrength.color}`}>
+                            <span
+                              className={`text-xs font-semibold ${passwordStrength.color}`}
+                            >
                               {passwordStrength.label}
                             </span>
                           </div>
@@ -327,7 +346,11 @@ export default function ResetPassword() {
                                   ? "bg-yellow-500"
                                   : "bg-green-500"
                               }`}
-                              style={{ width: `${(passwordStrength.strength / 5) * 100}%` }}
+                              style={{
+                                width: `${
+                                  (passwordStrength.strength / 5) * 100
+                                }%`,
+                              }}
                             />
                           </div>
                         </div>
@@ -359,7 +382,9 @@ export default function ResetPassword() {
                         />
                         <button
                           type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                           className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
                         >
                           {showConfirmPassword ? (
@@ -384,25 +409,47 @@ export default function ResetPassword() {
                       </p>
                       <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                         <li className="flex items-center gap-2">
-                          <span className={newPassword?.length >= 8 ? "text-green-500" : ""}>
+                          <span
+                            className={
+                              newPassword?.length >= 8 ? "text-green-500" : ""
+                            }
+                          >
                             {newPassword?.length >= 8 ? "✓" : "○"}
                           </span>
                           At least 8 characters
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className={/[A-Z]/.test(newPassword || "") ? "text-green-500" : ""}>
+                          <span
+                            className={
+                              /[A-Z]/.test(newPassword || "")
+                                ? "text-green-500"
+                                : ""
+                            }
+                          >
                             {/[A-Z]/.test(newPassword || "") ? "✓" : "○"}
                           </span>
                           One uppercase letter
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className={/[a-z]/.test(newPassword || "") ? "text-green-500" : ""}>
+                          <span
+                            className={
+                              /[a-z]/.test(newPassword || "")
+                                ? "text-green-500"
+                                : ""
+                            }
+                          >
                             {/[a-z]/.test(newPassword || "") ? "✓" : "○"}
                           </span>
                           One lowercase letter
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className={/\d/.test(newPassword || "") ? "text-green-500" : ""}>
+                          <span
+                            className={
+                              /\d/.test(newPassword || "")
+                                ? "text-green-500"
+                                : ""
+                            }
+                          >
                             {/\d/.test(newPassword || "") ? "✓" : "○"}
                           </span>
                           One number

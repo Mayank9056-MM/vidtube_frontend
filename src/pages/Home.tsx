@@ -65,16 +65,6 @@ export default function Home() {
     "Business",
   ];
 
-  // Helper function to format views
-  const formatViews = (views: number) => {
-    if (views >= 1000000) {
-      return `${(views / 1000000).toFixed(1)}M`;
-    } else if (views >= 1000) {
-      return `${(views / 1000).toFixed(1)}K`;
-    }
-    return views.toString();
-  };
-
   return (
     <div className="w-full h-full overflow-y-auto bg-white dark:bg-black">
       {/* Category Chips - Sticky */}
@@ -131,21 +121,7 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
               {videos.map((video: any) => (
                 <VideoCard
-                  key={video._id}
-                  video={{
-                    id: video._id,
-                    thumbnail: video.thumbnail,
-                    title: video.title,
-                    channel: video.owner?.username || "Unknown",
-                    avatar:
-                      video.owner?.avatar ||
-                      `https://ui-avatars.com/api/?name=${video.owner?.username}&background=ef4444&color=fff`,
-                    views: formatViews(video.views || 0),
-                    uploadedAt: formatDate(video.createdAt || new Date()),
-                    duration: formatDuration(video.duration || 0),
-                    verified: video.owner?.isVerified || false,
-                  }}
-                  theme={theme}
+                  video={video}
                 />
               ))}
             </div>

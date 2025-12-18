@@ -236,12 +236,12 @@ export const forgotPasswordUserApi = async (email: string): Promise<string> => {
  */
 export const resetPasswordUserApi = async (
   token: string,
-  data: resetPasswordData
+  password: resetPasswordData
 ): Promise<string> => {
   try {
     const res = await axiosInstance.post(
-      `/api/v1/users/reset-password/:${token}`,
-      { data }
+      `/api/v1/users/reset-password/${token}`,
+      { password }
     );
     logger.info("res from reset password user api => ", res);
     return res.data.data;
