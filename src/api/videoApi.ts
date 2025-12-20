@@ -21,7 +21,7 @@ export const publishVideoApi = async (data: publishVideoData) => {
 // get video by id
 export const getVideoByIdApi = async (videoId: string) => {
   try {
-    logger.info(videoId,"video Id from get video by id")
+    logger.info(videoId, "video Id from get video by id");
     const res = await axiosInstance.get(`/api/v1/videos/get-video/${videoId}`);
 
     logger.info("res from get video by id api => ", res);
@@ -86,25 +86,44 @@ export const togglePublishStatusApi = async (videoId: string) => {
 };
 
 // get all videos
-export const getAllVideosApi = async () => {
+export const getAllVideosApi = async (params?: {
+  page?: number;
+  limit?: number;
+  query?: string;
+  userId?: string;
+}) => {
   try {
-    const res = await axiosInstance.get(`/api/v1/videos/all-videos`);
+    const res = await axiosInstance.get("/api/v1/videos/all-videos", {
+      params,
+    });
 
-    logger.info("res from get all videos api => ", res);
     return res.data.data;
   } catch (error: any) {
-    logger.warn("error in get all videos api", error);
-    return error.message;
+    logger.error("getAllVideosApi failed", error);
+    throw error;
   }
 };
 
-export const addViewApi = async (videoId: string ) => {
+export const getUserVideosApi = async (userId: string) => {
+  try {
+    const res = await axiosInstance.get("/api/v1/videos/user-videos", {
+      params: userId,
+    });
+    logger.info("res from get user videos api => ", res);
+    return res.data.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const addViewApi = async (videoId: string) => {
   try {
     const res = await axiosInstance.post(`/api/v1/videos/add-view/${videoId}`);
     logger.info("res from add view api => ", res);
     return res.data;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     throw error;
   }
-}
+};

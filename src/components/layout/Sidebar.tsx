@@ -23,7 +23,7 @@ export const Sidebar = () => {
 
   const mainItems = [
     { icon: Home, label: "Home", path: "/home", active: true },
-    { icon: Video, label: "Videos", path: "/videos" },
+    { icon: Video, label: "Videos", path: "/my-videos" },
     { icon: MessageSquare, label: "Tweets", path: "/tweets" },
     { icon: PlaySquare, label: "Subscriptions", path: "/subscriptions" },
   ];

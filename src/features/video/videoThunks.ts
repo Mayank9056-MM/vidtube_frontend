@@ -7,6 +7,7 @@ import {
   togglePublishStatusApi,
   getAllVideosApi,
   addViewApi,
+  getUserVideosApi,
 } from "@/api/videoApi";
 import type { publishVideoData, updateVideoData } from "@/api/videoApi.types";
 import { logger } from "@/utls/logger";
@@ -40,16 +41,31 @@ export const getVideoById = createAsyncThunk(
 // Get All Videos
 export const getAllVideos = createAsyncThunk(
   "videos/getAllVideos",
-  async (_, { rejectWithValue }) => {
+  async (params: any, { rejectWithValue }) => {
     try {
-      const res = await getAllVideosApi();
-      logger.info("videos from all videos",res)
-      return res;
+      const data = await getAllVideosApi(params);
+      return data;
     } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch videos");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch videos"
+      );
     }
   }
 );
+
+export const getUserVideos = createAsyncThunk(
+  "videos/user-videos",
+  async (userId: string, { rejectWithValue }) => {
+    try {
+      const data = await getUserVideosApi(userId);
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch videos"
+      );
+    }
+  }
+)
 
 // Delete Video
 export const deleteVideo = createAsyncThunk(
