@@ -7,6 +7,7 @@ import {
   updateVideo,
   togglePublishStatus,
   addView,
+  getUserVideos,
 } from "../video/videoThunks";
 
 export interface Video {
@@ -73,6 +74,19 @@ const videoSlice = createSlice({
         state.videos = action.payload.allVideo || action.payload;
       })
       .addCase(getAllVideos.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    builder
+      .addCase(getUserVideos.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getUserVideos.fulfilled, (state, action) => {
+        state.loading = false;
+        state.videos = action.payload.userVideos || action.payload;
+      })
+      .addCase(getUserVideos.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

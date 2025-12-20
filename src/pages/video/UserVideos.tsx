@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import type { RootState } from "@/app/store";
-import { 
-  MoreVertical, 
-  Trash2, 
-  Edit, 
-  Eye, 
+import {
+  MoreVertical,
+  Trash2,
+  Edit,
+  Eye,
   Clock,
   Upload,
   Search,
   Filter,
   Loader2,
   X,
-  Check
+  Check,
 } from "lucide-react";
-import { getAllVideos } from "@/features/video/videoThunks";
+import { getAllVideos, getUserVideos } from "@/features/video/videoThunks";
 import { formatDate, formatDuration, formatNumber } from "@/utls/helpers";
 
 export default function UserVideos() {
@@ -36,16 +36,10 @@ export default function UserVideos() {
   const [editDescription, setEditDescription] = useState("");
 
   useEffect(() => {
-    fetchUserVideos();
-  }, []);
-
-  const fetchUserVideos = async () => {
-    try {
-      await dispatch(getAllVideos());
-    } catch (error) {
-      console.error("Error fetching videos:", error);
+    if (user?._id) {
+      dispatch(getUserVideos({ userId: user._id }));
     }
-  };
+  }, [dispatch, user]);
 
   const handleDeleteVideo = async (videoId: string) => {
     try {
@@ -88,6 +82,12 @@ export default function UserVideos() {
       (filterStatus === "draft" && !video.isPublished);
     return matchesSearch && matchesFilter;
   });
+
+  const fetchUserVideos = () => {
+    if (user?._id) {
+      dispatch(getUserVideos({ userId: user._id }));
+    }
+  }
 
   return (
     <div className="w-full h-full overflow-y-auto bg-white dark:bg-black">
@@ -132,7 +132,9 @@ export default function UserVideos() {
                 <option value="draft">Drafts</option>
               </select>
               <button
-                onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+                onClick={() =>
+                  setViewMode(viewMode === "grid" ? "list" : "grid")
+                }
                 className="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               >
                 {viewMode === "grid" ? "List" : "Grid"}
@@ -149,7 +151,9 @@ export default function UserVideos() {
           <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Videos</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Videos
+                </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                   {videos.length}
                 </p>
@@ -162,9 +166,16 @@ export default function UserVideos() {
           <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Views</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Views
+                </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                  {formatNumber(videos.reduce((acc: number, v: any) => acc + (v.views || 0), 0))}
+                  {formatNumber(
+                    videos.reduce(
+                      (acc: number, v: any) => acc + (v.views || 0),
+                      0
+                    )
+                  )}
                 </p>
               </div>
               <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
@@ -175,7 +186,9 @@ export default function UserVideos() {
           <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Published</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Published
+                </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                   {videos.filter((v: any) => v.isPublished).length}
                 </p>
@@ -213,7 +226,13 @@ export default function UserVideos() {
 
         {/* Videos List/Grid */}
         {!loading && filteredVideos.length > 0 && (
-          <div className={viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" : "space-y-3"}>
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                : "space-y-3"
+            }
+          >
             {filteredVideos.map((video: any) => (
               <div
                 key={video._id}
@@ -222,7 +241,9 @@ export default function UserVideos() {
                 }`}
               >
                 {/* Thumbnail */}
-                <div className={viewMode === "list" ? "w-40 flex-shrink-0" : ""}>
+                <div
+                  className={viewMode === "list" ? "w-40 flex-shrink-0" : ""}
+                >
                   <div className="relative">
                     <img
                       src={video.thumbnail}
@@ -348,8 +369,8 @@ export default function UserVideos() {
               Delete Video
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Are you sure you want to delete "{selectedVideo.title}"? This action
-              cannot be undone.
+              Are you sure you want to delete "{selectedVideo.title}"? This
+              action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
