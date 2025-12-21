@@ -251,6 +251,12 @@ export const resetPasswordUserApi = async (
   }
 };
 
+/**
+ * Changes a user's password given the old password and new password.
+ *
+ * @param {ChangePasswordData} data - The change password data
+ * @returns {Promise<string>} - A success message or error message
+ */
 export const changeUserPasswordApi = async (data: ChangePasswordData) => {
   try {
     const res = await axiosInstance.post("/api/v1/users/change-password", {
