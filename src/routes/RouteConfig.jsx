@@ -9,6 +9,7 @@ import ChannelPage from "@/pages/subscription/ChannelPage";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ResetPassword from "@/pages/auth/ResetPassword";
 import UserVideos from "@/pages/video/UserVideos";
+import UserChannel from "@/pages/user/UserChannel";
 
 export const publicRoutes = [
   {
@@ -56,6 +57,10 @@ export const privateRoutes = [
   },
   {
     path: "/my-videos",
-    element: <UserVideos />
-  }
+    element: <UserVideos />,
+  },
+  {
+    path: "/my-channel",
+    element: <UserChannel />,
+  },
 ];
