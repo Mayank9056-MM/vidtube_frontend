@@ -29,7 +29,7 @@ export const Sidebar = () => {
   ];
 
   const personalItems = [
-    { icon: User, label: "Your Channel", path: "/channel" },
+    { icon: User, label: "Your Channel", path: "/my-channel" },
     { icon: History, label: "Watch History", path: "/history" },
     { icon: ListVideo, label: "Playlists", path: "/playlists" },
     { icon: Clock, label: "Watch Later", path: "/watch-later" },
