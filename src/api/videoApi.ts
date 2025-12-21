@@ -53,9 +53,17 @@ export const updateVideoApi = async (
   data: updateVideoData
 ) => {
   try {
+    const formData = new FormData();
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value as any);
+      }
+    });
+
     const res = await axiosInstance.patch(
       `/api/v1/videos/update-video/${videoId}`,
-      data,
+      formData,
       {
         headers: {
           "Content-Type": "multipart/form-data",
