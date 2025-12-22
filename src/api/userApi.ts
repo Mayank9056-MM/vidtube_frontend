@@ -15,7 +15,7 @@ import type {
  * @param {RegisterUserData} data - The register user data
  * @returns {Promise<string>} - The response message or error message
  */
-export const registerUserApi = async (data: RegisterUserData) => {
+export const registerUserApi = async (data: RegisterUserData): Promise<string> => {
   try {
     const res = await axiosInstance.post("/api/v1/users/register", data, {
       headers: {
@@ -38,7 +38,7 @@ export const registerUserApi = async (data: RegisterUserData) => {
  * @param {LoginUserData} data - The login data
  * @returns {Promise<object>} - The login response or error message
  */
-export const loginUserApi = async (data: LoginUserData) => {
+export const loginUserApi = async (data: LoginUserData): Promise<object> => {
   try {
     const res = await axiosInstance.post("/api/v1/users/login", data);
     logger.info("res from login user api => ", res);
@@ -56,7 +56,7 @@ export const loginUserApi = async (data: LoginUserData) => {
  *
  * @returns {Promise<object>} - The response object or error message
  */
-export const logoutUserApi = async () => {
+export const logoutUserApi = async (): Promise<object> => {
   try {
     const res = await axiosInstance.post("/api/v1/users/logout");
     logger.info("res from logout user api => ", res);
@@ -76,7 +76,7 @@ export const logoutUserApi = async () => {
  *
  * @returns {Promise<string>} - The new access token or the same access token if it is not expired
  */
-export const refreshAccessTokenApi = async () => {
+export const refreshAccessTokenApi = async (): Promise<string> => {
   try {
     const res = await axiosInstance.post("/api/v1/users/refresh-token");
     logger.info("res from refresh access token user api => ", res);
@@ -109,7 +109,7 @@ export const changePassUserApi = async (data: ChangePasswordData) => {
  * @param {UpdateAccountData} data - The update account data
  * @returns {Promise<object>} - The updated user account or error message
  */
-export const updateAccountUserApi = async (data: UpdateAccountData) => {
+export const updateAccountUserApi = async (data: UpdateAccountData): Promise<object> => {
   try {
     const res = await axiosInstance.patch("/api/v1/users/update-account", data);
     logger.info("res from update account user api => ", res);
@@ -124,7 +124,7 @@ export const updateAccountUserApi = async (data: UpdateAccountData) => {
  * Get current user
  * @returns {Promise<object>} - The current user or error message
  */
-export const currentUserApi = async () => {
+export const currentUserApi = async (): Promise<object> => {
   try {
     const res = await axiosInstance.get("/api/v1/users/current-user");
     logger.info("res from current user api => ", res);
@@ -140,7 +140,7 @@ export const currentUserApi = async () => {
  * @param {UpdateAvatarData} data - The update avatar data
  * @returns {Promise<string>} - The updated avatar or error message
  */
-export const updateAvatarUserApi = async (data: UpdateAvatarData) => {
+export const updateAvatarUserApi = async (data: UpdateAvatarData): Promise<string> => {
   try {
     const res = await axiosInstance.patch("/api/v1/users/avatar", data, {
       headers: {
@@ -160,7 +160,7 @@ export const updateAvatarUserApi = async (data: UpdateAvatarData) => {
  * @param {UpdateThumbnailData} data - The update thumbnail data
  * @returns {Promise<string>} - The updated thumbnail or error message
  */
-export const updateThumbnailUserApi = async (data: UpdateThumbnailData) => {
+export const updateThumbnailUserApi = async (data: UpdateThumbnailData): Promise<string> => {
   try {
     const res = await axiosInstance.patch("/api/v1/users//cover-image", data, {
       headers: {
@@ -179,7 +179,7 @@ export const updateThumbnailUserApi = async (data: UpdateThumbnailData) => {
  * Get user channel profile
  * @returns {Promise<object>} - The user channel profile or error message
  */
-export const getUserChannelProfileApi = async () => {
+export const getUserChannelProfileApi = async (): Promise<object> => {
   try {
     const res = await axiosInstance.get("/api/v1/users/c/:username");
     logger.info("res from getUserChannel api => ", res);
@@ -194,11 +194,11 @@ export const getUserChannelProfileApi = async () => {
  * Get user watch history
  * @returns {Promise<string>} - The user watch history or error message
  */
-export const getUserWatchHistoryApi = async () => {
+export const getUserWatchHistoryApi = async (): Promise<string> => {
   try {
     const res = await axiosInstance.get("/api/v1/users/history");
     logger.info("res from get user watch history api => ", res);
-    return res.data;
+    return res.data.data;
   } catch (error: any) {
     logger.warn("error in get user watch history api", error);
     throw error.message;
@@ -257,7 +257,7 @@ export const resetPasswordUserApi = async (
  * @param {ChangePasswordData} data - The change password data
  * @returns {Promise<string>} - A success message or error message
  */
-export const changeUserPasswordApi = async (data: ChangePasswordData) => {
+export const changeUserPasswordApi = async (data: ChangePasswordData): Promise<string> => {
   try {
     const res = await axiosInstance.post("/api/v1/users/change-password", {
       data,
@@ -269,3 +269,4 @@ export const changeUserPasswordApi = async (data: ChangePasswordData) => {
     throw error;
   }
 };
+

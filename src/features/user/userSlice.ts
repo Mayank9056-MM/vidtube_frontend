@@ -25,6 +25,7 @@ interface UserState {
   successMessage?: string | null;
   initialized?: boolean;
   forgotPasswordAttempt?: boolean;
+  watchHistory?: Array<object>;
 }
 
 const getInitialTheme = (): "light" | "dark" => {
@@ -45,6 +46,7 @@ const initialState: UserState = {
   successMessage: null,
   initialized: false,
   forgotPasswordAttempt: false,
+  watchHistory: [],
 };
 
 const userSlice = createSlice({
@@ -168,10 +170,8 @@ const userSlice = createSlice({
 
     // --- WATCH HISTORY ---
     builder.addCase(getWatchHistory.fulfilled, (state, action) => {
-      state.user = {
-        ...state.user,
-        history: action.payload.history,
-      };
+      state.watchHistory = action.payload
+      
     });
 
     // --- LOGOUT ---
