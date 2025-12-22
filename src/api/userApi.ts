@@ -198,7 +198,7 @@ export const getUserWatchHistoryApi = async (): Promise<string> => {
   try {
     const res = await axiosInstance.get("/api/v1/users/history");
     logger.info("res from get user watch history api => ", res);
-    return res.data;
+    return res.data.data;
   } catch (error: any) {
     logger.warn("error in get user watch history api", error);
     throw error.message;
