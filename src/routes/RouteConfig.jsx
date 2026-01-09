@@ -11,6 +11,7 @@ import ResetPassword from "@/pages/auth/ResetPassword";
 import UserVideos from "@/pages/video/UserVideos";
 import UserChannel from "@/pages/user/UserChannel";
 import UserWatchHistory from "@/pages/user/UserWatchHistory";
+import PlaylistPage from "@/pages/playlist/PlaylistPage";
 
 export const publicRoutes = [
   {
@@ -68,4 +69,8 @@ export const privateRoutes = [
     path: "/watch-history",
     element: <UserWatchHistory />,
   },
+  {
+    path: "/playlists",
+    element: <PlaylistPage />,
+  }
 ];
